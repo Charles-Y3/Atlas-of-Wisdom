@@ -29,6 +29,7 @@ export default function Profile() {
   const next = nextRankForXp(progress.xp);
   const [tab, setTab] = useState<Tab>('overview');
   const [rankOpen, setRankOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const pct = next
     ? Math.min(100, Math.round(((progress.xp - rank.minXp) / (next.minXp - rank.minXp)) * 100))
@@ -50,7 +51,7 @@ export default function Profile() {
       <h1 className="page-title">🧭 {t('profileTitle')}</h1>
       <p className="page-subtitle">{t('profileAbout')}</p>
 
-      <div className="chip-row" style={{ marginBottom: 14 }}>
+      <div className="chip-row profile-tabs" style={{ marginBottom: 14 }}>
         {tabs.map((tabDef) => (
           <button
             key={tabDef.id}
@@ -88,8 +89,10 @@ export default function Profile() {
               type="button"
               className="btn secondary"
               style={{ marginTop: 14 }}
-              onClick={() =>
-                exportPassportPng(
+              disabled={exporting}
+              onClick={() => {
+                setExporting(true);
+                void exportPassportPng(
                   {
                     xp: progress.xp,
                     streak: progress.streak,
@@ -99,10 +102,10 @@ export default function Profile() {
                   },
                   locale,
                   t('appName'),
-                )
-              }
+                ).finally(() => setExporting(false));
+              }}
             >
-              🛂 {t('profileExportPassport')}
+              🛂 {exporting ? t('loading') : t('profileExportPassport')}
             </button>
           </div>
 

@@ -14,7 +14,17 @@ export const XP_FOR = {
   exploreLegend: 30,    // first open of a legendary place
   questStep: 40,        // marking a quest stop's story as read
   questComplete: 120,   // finishing every stop on a quest
+  streak3: 30,          // first time a journey reaches 3 days
+  streak7: 70,          // a full week of returning
+  streak30: 200,        // a month on the path
 } as const;
+
+/** Streak lengths that grant a one-time (per reach) XP bonus. */
+export const STREAK_XP_MILESTONES: Record<number, number> = {
+  3: XP_FOR.streak3,
+  7: XP_FOR.streak7,
+  30: XP_FOR.streak30,
+};
 
 // ── Explorer ranks (from the vision doc) ───────────────────────────────
 export interface Rank {

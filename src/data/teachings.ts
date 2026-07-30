@@ -577,6 +577,56 @@ export const LOCATION_TEACHINGS: Record<string, Teaching> = {
       '阿南古人对敬重土地（Country）的教导',
     ),
   },
+  'mount-kailash': {
+    text: localized(
+      'Some peaks are not for standing on. Walk around what you revere — and let the mountain remain taller than your ambition.',
+      '有些峰顶不是为了站上去。绕行你所敬畏的 — 让山仍比你的野心更高。',
+    ),
+    attribution: localized(
+      'Spirit of the Kailash kora (paraphrased)',
+      '冈仁波齐转山精神（意译）',
+    ),
+  },
+  ausangate: {
+    text: localized(
+      'A mountain can be a relative. Greet it, offer what you can, and leave with less pride than you brought.',
+      '山可以是亲戚。问候它，献上你所能献的，带着比来时更少的骄傲离开。',
+    ),
+    attribution: localized(
+      'Andean teaching on apus (paraphrased)',
+      '安第斯关于阿普的教诲（意译）',
+    ),
+  },
+  'galapagos-islands': {
+    text: localized(
+      'Look closely enough, and kinship appears where you expected only difference — the living world is one family wearing many forms.',
+      '看得够细，亲缘就会出现在你本以为只有差异之处 — 活的世界是一家人，穿着许多形态。',
+    ),
+    attribution: localized(
+      'Spirit of Darwin\u2019s Galápagos insight (paraphrased)',
+      '达尔文加拉帕戈斯洞见的精神（意译）',
+    ),
+  },
+  'svalbard-global-seed-vault': {
+    text: localized(
+      'Guard the seeds of what feeds us — for the future has a right to the diversity we almost spent.',
+      '守护喂养我们的种子 — 因为未来有权拥有我们几乎耗尽的多样。',
+    ),
+    attribution: localized(
+      'Spirit of the Global Seed Vault mission (paraphrased)',
+      '全球种子库使命的精神（意译）',
+    ),
+  },
+  'challenger-deep': {
+    text: localized(
+      'The deepest blue on the map is not empty. It is unread — and humility is the first instrument of exploration.',
+      '地图上最深的蓝不是空虚。它只是尚未读过 — 而谦卑是探索的第一件仪器。',
+    ),
+    attribution: localized(
+      'Reflection on the deep ocean (Atlas of Wisdom)',
+      '关于深海的省思（智慧地图集）',
+    ),
+  },
 };
 
 export const PERSON_TEACHINGS: Record<string, Teaching> = {

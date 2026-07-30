@@ -20,32 +20,61 @@ export default function DailyQuiz() {
   const answerQuiz = useProgress((s) => s.answerQuiz);
   const [picked, setPicked] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Sync lock — React state alone races on double-taps before re-render. */
+  const lockedRef = useRef(false);
+  const questionRef = useRef(0);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const answered = quiz?.day === today ? quiz.answered : 0;
   const done = answered >= 3;
   const q = done ? null : questions[answered];
+  questionRef.current = answered;
 
+  function clearTimers() {
+    for (const id of timers.current) clearTimeout(id);
+    timers.current = [];
+  }
+
+  useEffect(() => () => clearTimers(), []);
+
+  // New question → unlock for the next attempt.
   useEffect(() => {
-    return () => {
-      if (resetTimer.current) clearTimeout(resetTimer.current);
-    };
-  }, []);
+    clearTimers();
+    lockedRef.current = false;
+    setPicked(null);
+  }, [answered]);
 
   function choose(i: number) {
-    if (!q || picked !== null) return;
+    if (!q || lockedRef.current) return;
+    lockedRef.current = true;
     setPicked(i);
+    const atQuestion = answered;
     const correct = i === q.correctIndex;
+
     if (correct) {
-      setTimeout(() => {
+      const id = setTimeout(() => {
+        // Ignore stale timers if the question index already moved.
+        if (questionRef.current !== atQuestion) return;
         answerQuiz(true);
-        setPicked(null);
+        // unlock happens in the answered-effect after advance
       }, 700);
+      timers.current.push(id);
       return;
     }
-    // Mastery: never advance on wrong — clear after brief feedback.
-    if (resetTimer.current) clearTimeout(resetTimer.current);
-    resetTimer.current = setTimeout(() => setPicked(null), 900);
+
+    // Mastery: never call answerQuiz on wrong — only unlock for retry.
+    const id = setTimeout(() => {
+      if (questionRef.current !== atQuestion) return;
+      setPicked(null);
+      lockedRef.current = false;
+    }, 900);
+    timers.current.push(id);
+  }
+
+  function tryAgain() {
+    clearTimers();
+    setPicked(null);
+    lockedRef.current = false;
   }
 
   return (
@@ -68,7 +97,8 @@ export default function DailyQuiz() {
             if (picked !== null && i === picked) cls += i === q.correctIndex ? ' correct' : ' wrong';
             return (
               <button
-                key={i}
+                key={`${answered}-${i}`}
+                type="button"
                 className={cls}
                 disabled={picked !== null}
                 onClick={() => choose(i)}
@@ -82,13 +112,7 @@ export default function DailyQuiz() {
               <p className="feature-sub" style={{ color: 'var(--bad)', marginTop: 4 }}>
                 {t('quizWrong')}
               </p>
-              <button
-                className="btn subtle"
-                onClick={() => {
-                  if (resetTimer.current) clearTimeout(resetTimer.current);
-                  setPicked(null);
-                }}
-              >
+              <button type="button" className="btn subtle" onClick={tryAgain}>
                 {t('quizTryAgain')}
               </button>
             </>

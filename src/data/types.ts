@@ -156,6 +156,11 @@ export interface LegendaryPlace {
   leadingTheories: { title: Localized<string>; summary: Localized<string> }[];
   /** Optional real Atlas location id. */
   relatedRealPlace?: string;
+  /**
+   * Path under `public/` to an offline parchment plate
+   * (e.g. `illustrations/atlantis.webp`).
+   */
+  illustration?: string;
 }
 
 /**

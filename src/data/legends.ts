@@ -288,6 +288,7 @@ export const LEGENDS: LegendaryPlace[] = [
       },
     ],
     relatedRealPlace: 'delphi',
+    illustration: 'illustrations/hyperborea.webp',
   },
   {
     id: 'avalon',
@@ -504,6 +505,237 @@ export const LEGENDS: LegendaryPlace[] = [
         ),
       },
     ],
+  },
+  {
+    id: 'terra-australis',
+    name: localized('Terra Australis', '南方大陆'),
+    emoji: '🧭',
+    claimedLocations: [
+      {
+        coords: [135.0, -50.0],
+        label: localized('Imagined southern continent (pre-modern charts)', '想象中的南方大陆（前现代海图）'),
+      },
+      {
+        coords: [0.0, -70.0],
+        label: localized('Far south / Antarctic fringe on speculative maps', '远南 / 臆测地图上的南极边缘'),
+      },
+      {
+        coords: [145.0, -38.0],
+        label: localized('Later conflated with Australia after Dutch sightings', '荷兰人望见陆地后，常与澳大利亚相混'),
+      },
+    ],
+    firstSource: localized(
+      'Classical and Renaissance geography — Aristotle and Ptolemy suggested a southern landmass to “balance” the north; mapmakers drew it for centuries before anyone stood on Antarctic ice.',
+      '古典与文艺复兴地理 — 亚里士多德与托勒密曾设想南方应有陆地以“平衡”北方；制图师画了数百年，才有人踏上南极之冰。',
+    ),
+    theWhyItPersists: localized(
+      [
+        'Terra Australis is the south that maps invented before they discovered ice. Symmetry felt wiser than emptiness: if Eurasia bulked the north, something vast must answer below. For ages the southern continent was a blank labelled with certainty.',
+        'When ships finally closed the gap, the name splintered — into Australia, into Antarctica, into the humbler truth that the map was guessing. We keep the legend because it shows how hunger for order can draw a world that is not yet there.',
+      ],
+      [
+        '南方大陆是地图在发现冰之前发明的南方。对称似乎比空虚更明智：欧亚若厚重于北，南方就该有广袤的回应。长久以来，那片大陆是被自信标注的空白。',
+        '当船终于合上缺口，名字裂开 — 成为澳大利亚、成为南极洲，也成为更谦卑的真相：地图曾在猜测。传说仍在，因为它显明：对秩序的渴望，能画出尚未存在的世界。',
+      ],
+    ),
+    leadingTheories: [
+      {
+        title: localized('Cartographic necessity', '制图的必要'),
+        summary: localized(
+          'Many historians treat Terra Australis as a diagram of balance, not a report from travellers.',
+          '许多史家视南方大陆为平衡的图示，而非旅人的报告。',
+        ),
+      },
+      {
+        title: localized('Partial landfalls', '零星的靠岸'),
+        summary: localized(
+          'Dutch and later sightings of Australia were sometimes pasted onto the old southern giant — one real coast feeding an oversized myth.',
+          '荷兰人及后世对澳大利亚的望见，有时被贴上旧日南方巨陆 — 一段真实海岸养活了过大的神话。',
+        ),
+      },
+      {
+        title: localized('Antarctic revelation', '南极的揭晓'),
+        summary: localized(
+          'Nineteenth-century Antarctic exploration replaced the temperate dream-continent with ice — ending the map fiction, not the human love of edges.',
+          '十九世纪的南极探索，用冰取代了温带梦大陆 — 结束了地图虚构，却未结束人类对边缘的热爱。',
+        ),
+      },
+    ],
+    illustration: 'illustrations/terra-australis.webp',
+  },
+  {
+    id: 'meru',
+    name: localized('Mount Meru', '须弥山'),
+    emoji: '⛰️',
+    claimedLocations: [
+      {
+        coords: [86.925, 27.988],
+        label: localized('Ideal axis near the high Himalaya (symbolic, not a survey peak)', '近高喜马拉雅的理想轴心（象征，非测绘峰）'),
+      },
+      {
+        coords: [88.0, 29.0],
+        label: localized('Tibetan plateau cosmography', '青藏高原宇宙观'),
+      },
+      {
+        coords: [78.0, 32.0],
+        label: localized('Some later charts near Kailash / western Himalaya', '后世部分图绘近冈仁波齐 / 西喜马拉雅'),
+      },
+    ],
+    firstSource: localized(
+      'Hindu, Jain and Buddhist cosmologies — Meru (Sumeru) as the world-mountain at the centre of continents, heavens and seas.',
+      '印度教、耆那教与佛教宇宙观 — 须弥（苏迷卢）为世界之山，立于诸洲、诸天与大海之中心。',
+    ),
+    theWhyItPersists: localized(
+      [
+        'Meru is not a summit to bag. It is the spine of a pictured cosmos: gods above, humans on the slopes of meaning, oceans of milk and salt arranged like a mandala. Pilgrims who walk real peaks still carry Meru in the mind as the mountain that holds the sky steady.',
+        'The story endures because people need an axis — a quiet centre when maps and politics spin. Meru answers without GPS: the sacred can be a geometry of the heart as much as a line on stone.',
+      ],
+      [
+        '须弥不是一座要征服的顶峰。它是被描绘的宇宙之脊：神在上，人在意义的山坡，乳海与盐海如曼荼罗排布。行走真峰的朝圣者，仍在心中怀着须弥 — 那稳住天空的山。',
+        '故事仍在，因为人需要一根轴 — 当地图与政治旋转时，有一处安静的中心。须弥无需卫星定位作答：神圣既可以是心中的几何，也可以是石上的线条。',
+      ],
+    ),
+    leadingTheories: [
+      {
+        title: localized('Sacred cosmology', '神圣宇宙论'),
+        summary: localized(
+          'Most scholars read Meru as a map of meaning — a temple plan for the universe — not a single climbable mountain.',
+          '多数学者视须弥为意义之图 — 宇宙的殿堂平面 — 而非一座可攀的山。',
+        ),
+      },
+      {
+        title: localized('Himalayan echo', '喜马拉雅回响'),
+        summary: localized(
+          'Later traditions sometimes lean Meru toward Kailash or other high places; the identification stays fluid and disputed.',
+          '后世传统偶将须弥靠向冈仁波齐或其他高峰；对应关系流动而有争议。',
+        ),
+      },
+      {
+        title: localized('Temple as Meru', '以寺为须弥'),
+        summary: localized(
+          'Many Asian temples are built as Meru in miniature — the legend lives in architecture as much as in geography.',
+          '许多亚洲寺庙建成微型须弥 — 传说活在建筑里，一如活在地理中。',
+        ),
+      },
+    ],
+    relatedRealPlace: 'mount-kailash',
+    illustration: 'illustrations/meru.webp',
+  },
+  {
+    id: 'kunlun',
+    name: localized('Kunlun', '昆仑'),
+    emoji: '🍑',
+    claimedLocations: [
+      {
+        coords: [80.0, 36.0],
+        label: localized('Kunlun range, western China (mythic palace tradition)', '中国西部昆仑山脉（仙宫传统）'),
+      },
+      {
+        coords: [75.0, 38.0],
+        label: localized('Pamir / high Inner Asia fringe', '帕米尔 / 内亚高地边缘'),
+      },
+      {
+        coords: [94.0, 36.0],
+        label: localized('Eastern approaches toward Qinghai–Tibet', '东向青海—西藏一带'),
+      },
+    ],
+    firstSource: localized(
+      'Early Chinese myth and Daoist lore — Kunlun as the axis of immortals, home of the Queen Mother of the West and peaches of long life.',
+      '中国早期神话与道教传说 — 昆仑为仙人之轴，西王母所居，有长生之桃。',
+    ),
+    theWhyItPersists: localized(
+      [
+        'Kunlun is the western mountain where time loosens. Emperors dreamed of its peaches; poets sent their longing along the Silk Roads toward a palace above the clouds. It is less a border peak than a promise that somewhere west of ordinary life, the rules of aging soften.',
+        'People still speak Kunlun’s name because mortality is heavy. A range that shelters immortals is a map of hope drawn in stone and mist — and a reminder that Chinese sacred geography always looked both inward to the heart and outward to the horizon.',
+      ],
+      [
+        '昆仑是时间松动的西山。帝王梦见其桃；诗人把渴望沿丝路送向云上的宫殿。它与其说是边境之峰，不如说是一种承诺：在日常以西的某处，衰老的规则会软下来。',
+        '人们仍说昆仑之名，因为有死是沉重的。庇护仙人的山脉，是用石与雾画出的希望地图 — 也提醒我们：中国的神圣地理，一向既向内心，也向天边。',
+      ],
+    ),
+    leadingTheories: [
+      {
+        title: localized('Mythic axis', '神话之轴'),
+        summary: localized(
+          'Classicists of Chinese myth treat Kunlun as a movable sacred centre — sometimes west, always “beyond”.',
+          '中国神话研究常视昆仑为可移动的神圣中心 — 时在西方，总在“之外”。',
+        ),
+      },
+      {
+        title: localized('Real Kunlun range', '真实的昆仑山脉'),
+        summary: localized(
+          'The physical Kunlun mountains gave the myth a backbone of stone; palace and peach remain story, not excavation.',
+          '真实的昆仑山为神话提供了石头的脊梁；仙宫与桃仍是故事，而非发掘。',
+        ),
+      },
+      {
+        title: localized('Daoist paradise', '道教仙境'),
+        summary: localized(
+          'Later Daoist texts stock Kunlun with immortals and elixirs — a spiritual geography for cultivation, not a tourist pin.',
+          '后世道经以仙人与丹药充实昆仑 — 那是修行的精神地理，而非旅游标记。',
+        ),
+      },
+    ],
+    relatedRealPlace: 'mount-wudang',
+    illustration: 'illustrations/kunlun.webp',
+  },
+  {
+    id: 'ryugu-jo',
+    name: localized('Ryūgū-jō', '龙宫'),
+    emoji: '🐉',
+    claimedLocations: [
+      {
+        coords: [135.0, 35.5],
+        label: localized('Coasts of the Sea of Japan (Urashima Tarō tradition)', '日本海沿岸（浦岛太郎传统）'),
+      },
+      {
+        coords: [139.48, 35.30],
+        label: localized('Enoshima / eastern seaboard associations', '江之岛 / 东海岸联想'),
+      },
+      {
+        coords: [135.2, 35.6],
+        label: localized('Tango / western Honshū dragon-palace lore', '丹后 / 本州西部龙宫传说'),
+      },
+    ],
+    firstSource: localized(
+      'Japanese folktale — Urashima Tarō visits the Dragon Palace beneath the sea; a few days below become generations above.',
+      '日本传说 — 浦岛太郎造访海底龙宫；水下数日，岸上已是世代。',
+    ),
+    theWhyItPersists: localized(
+      [
+        'Ryūgū-jō is the deep as hospitality — coral halls, a kind turtle, a box that must not be opened. The ocean does not only threaten; it entertains, then teaches the cost of leaving time behind.',
+        'We retell it because everyone has opened a box they were warned about, or loved a place that would not let them return unchanged. The palace under the wave is a mirror for every journey that lasts longer than we planned.',
+      ],
+      [
+        '龙宫是作为款待的深海 — 珊瑚殿堂、义龟、一只不可打开的盒子。海洋不只威胁；它款待，然后教人：把时间留在身后要付什么代价。',
+        '我们重讲它，因为人人都开过被警告勿开的盒子，或爱过一个不让自己原样归来的地方。浪下的宫殿，映照每一次比计划更久的旅程。',
+      ],
+    ),
+    leadingTheories: [
+      {
+        title: localized('Folktale of time', '时间的民间故事'),
+        summary: localized(
+          'Folklorists read the tale as a parable of time dilation and irreversible return — not a diving report.',
+          '民俗学者视其为时间膨胀与不可逆归来的寓言 — 而非潜水报告。',
+        ),
+      },
+      {
+        title: localized('Coastal cult memory', '海岸祭仪的记忆'),
+        summary: localized(
+          'Dragon and sea-palace motifs appear in coastal shrines; local rites may have fed the story’s geography.',
+          '龙与海宫母题见于海岸神社；地方祭仪或滋养了故事的地理。',
+        ),
+      },
+      {
+        title: localized('Shared sea otherworlds', '共享的海上异界'),
+        summary: localized(
+          'Similar undersea otherworlds exist across cultures; Ryūgū-jō is Japan’s vivid local form of a wider human pattern.',
+          '相似的海底异界见于多种文化；龙宫是日本对这一更广人类模式的鲜明地方形态。',
+        ),
+      },
+    ],
+    relatedRealPlace: 'fushimi-inari',
+    illustration: 'illustrations/ryugu-jo.webp',
   },
 ];
 

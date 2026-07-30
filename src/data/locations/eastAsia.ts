@@ -538,4 +538,39 @@ export const EAST_ASIA: AtlasLocation[] = [
     ),
     wikipedia: 'Mount_Emei',
   },
+  {
+    id: 'mount-kailash',
+    name: localized('Mount Kailash', '冈仁波齐'),
+    category: 'sacred-mountain',
+    traditions: ['hinduism', 'buddhism', 'indigenous'],
+    country: localized('China', '中国'),
+    region: localized('Tibet Autonomous Region', '西藏自治区'),
+    continent: 'asia',
+    coords: [81.3119, 31.0669],
+    period: { fromYear: -1000 },
+    status: localized('Sacred peak; circumambulation, not summit conquest', '圣山；转山朝圣，而非登顶征服'),
+    whyItMatters: localized(
+      [
+        'A four-faced peak rises alone above the western Tibetan plateau, snow-bright and almost geometrically calm. For Hindus it is the abode of Shiva; for Buddhists, Jains and Bon pilgrims it is a world-axis you walk around rather than stand upon.',
+        'Each year people still complete the kora — a circuit of roughly fifty kilometres at thin air — some in a day, some prostrating for weeks. Kailash teaches a rare mountain wisdom: the holy response to height can be devotion without conquest.',
+      ],
+      [
+        '一座四面之峰独自升起在西藏西部高原之上，雪光明亮，几乎几何般平静。对印度教徒而言，此为湿婆所居；对佛教、耆那教与苯教朝圣者而言，它是须绕行而非登临的世界之轴。',
+        '每年仍有人完成转山 — 在稀薄空气中绕行约五十公里 — 有人一日走完，有人磕长头数周。冈仁波齐教人一种罕见的山岳智慧：对高度的神圣回应，可以是虔敬，而不是征服。',
+      ],
+    ),
+    timeline: [
+      { year: -1000, event: localized('Sacred geography of the peak is already alive in early Himalayan traditions.', '早期喜马拉雅传统中，此峰的神圣地理已然活跃。') },
+      { year: 900, event: localized('Buddhist and Bon pilgrimage circuits around the mountain are well attested in medieval sources.', '中古文献清楚记载佛苯绕山朝圣。') },
+      { year: 1980, event: localized('Modern pilgrims return in growing numbers as the region opens to travellers.', '地区向旅人开放后，现代朝圣者日渐增多。') },
+      { year: 2010, event: localized('International attention grows around protecting the pilgrimage landscape.', '保护转山圣地景观的国际关注上升。') },
+    ],
+    connectedPeople: [],
+    virtues: ['devotion', 'humility', 'perseverance'],
+    funFact: localized(
+      'No verified modern climbing expedition has summited Kailash — not for lack of skill, but because the peak is held too sacred to treat as a trophy.',
+      '冈仁波齐尚无经核实的现代登顶 — 并非技术不能，而是此峰被视为过于神圣，不宜当作战利品。',
+    ),
+    wikipedia: 'Mount_Kailash',
+  },
 ];

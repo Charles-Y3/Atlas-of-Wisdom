@@ -68,6 +68,12 @@ export const UI = {
   streakRitual3: localized('Three days on the path', '三日在路上'),
   streakRitual7: localized('A week of wonder', '一周的惊奇'),
   streakRitual30: localized('A month of seeking', '一月的求索'),
+  streakRitualHint: localized(
+    'Return tomorrow to keep the flame — gifts at 3, 7 and 30 days.',
+    '明天再来，火焰不灭 — 第 3、7、30 天有旅途礼物。',
+  ),
+  streakRitualNext: localized('Next gift at {n} days (+{xp} XP)', '下一份礼物：{n} 天（+{xp} 经验）'),
+  streakBonus: localized('Streak gift', '连续探索礼物'),
   rankLadderTitle: localized('Explorer ranks', '探索者等级'),
   rankLadderCurrent: localized('Current', '当前'),
   rankLadderNeed: localized('{n} XP to reach', '还需 {n} 经验到达'),

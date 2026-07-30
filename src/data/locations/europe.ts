@@ -425,4 +425,39 @@ export const EUROPE: AtlasLocation[] = [
     ),
     wikipedia: 'Stonehenge',
   },
+  {
+    id: 'svalbard-global-seed-vault',
+    name: localized('Svalbard Global Seed Vault', '斯瓦尔巴全球种子库'),
+    category: 'library',
+    traditions: ['scholarship'],
+    country: localized('Norway', '挪威'),
+    region: localized('Svalbard', '斯瓦尔巴'),
+    continent: 'europe',
+    coords: [15.4913, 78.2383],
+    period: { fromYear: 2008 },
+    status: localized('Active seed vault in permafrost', '永冻层中的活跃种子库'),
+    whyItMatters: localized(
+      [
+        'At the edge of the Arctic, a quiet door opens into the mountain. Behind it, in the cold, nations store copies of the world’s crop seeds — a library of life for a future that may need what we almost forgot.',
+        'The Seed Vault is not a temple, yet it behaves like one: pilgrimage of scientists, careful ritual of deposit, faith that tomorrow’s hungry deserve yesterday’s diversity. At the pole of winter, wisdom looks like patience sealed in ice.',
+      ],
+      [
+        '在北极边缘，一扇安静的门开向山体。门后寒冷之中，各国存放着世界作物种子的副本 — 一座生命的图书馆，留给可能需要我们几乎遗忘之物的未来。',
+        '种子库不是庙宇，却行事如庙：科学家的朝圣、存入的慎重仪式、相信明日的饥者配得昨日的多样。在冬之极地，智慧看起来像封在冰里的耐心。',
+      ],
+    ),
+    timeline: [
+      { year: 2006, event: localized('Norway begins construction of the vault inside a sandstone mountain.', '挪威开始在砂岩山体中建造种子库。') },
+      { year: 2008, event: localized('The vault opens and receives its first deposits.', '种子库启用并接收首批储存。') },
+      { year: 2015, event: localized('First major withdrawal helps restore collections damaged by war in Syria.', '首次大规模取出，协助恢复叙利亚战火受损的种质。') },
+      { year: 2020, event: localized('Holdings pass a million varieties — a growing ark of edible diversity.', '库存超过一百万品种 — 可食用多样性的方舟继续增长。') },
+    ],
+    connectedPeople: [],
+    virtues: ['perseverance', 'wisdom', 'justice'],
+    funFact: localized(
+      'The vault is designed to stay frozen even without power — using the mountain’s permafrost as a last natural guardian.',
+      '即便断电，库房也设计为保持冰冻 — 以山体永冻层为最后的天然守护。',
+    ),
+    wikipedia: 'Svalbard_Global_Seed_Vault',
+  },
 ];

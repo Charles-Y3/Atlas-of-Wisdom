@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useT } from '../../i18n/useT';
 import { LEGEND_BY_ID } from '../../data/legends';
 import { LOCATION_BY_ID } from '../../data/locations';
 import { CATEGORY_BY_ID } from '../../data/categories';
+import { illustrationCandidates } from '../../data/illustrations';
 import { useProgress, legendsUnlocked } from '../../state/store';
 
 export default function LegendPage() {
@@ -14,6 +15,9 @@ export default function LegendPage() {
   const exploreLegend = useProgress((s) => s.exploreLegend);
   const unlocked = legendsUnlocked(progress);
   const legend = id ? LEGEND_BY_ID[id] : undefined;
+  const [imgIdx, setImgIdx] = useState(0);
+  const imgSrcs = legend ? illustrationCandidates(legend.id, legend.illustration) : [];
+  const imgSrc = imgSrcs[imgIdx];
 
   useEffect(() => {
     if (legend && unlocked) exploreLegend(legend.id);
@@ -41,7 +45,15 @@ export default function LegendPage() {
 
   return (
     <div>
-      <div className="loc-hero legend-hero">
+      <div className={`loc-hero legend-hero ${imgSrc ? 'has-illustration' : ''}`}>
+        {imgSrc && (
+          <img
+            className="loc-hero-art"
+            src={imgSrc}
+            alt=""
+            onError={() => setImgIdx((i) => i + 1)}
+          />
+        )}
         <div className="loc-hero-inner">
           <button className="btn subtle" style={{ padding: '6px 14px', marginBottom: 12 }} onClick={() => navigate(-1)}>
             ← {t('back')}

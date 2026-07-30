@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { XP_FOR, rankIndexForXp, RANKS } from '../engine/progression';
+import { XP_FOR, rankIndexForXp, RANKS, STREAK_XP_MILESTONES } from '../engine/progression';
 import { todayKey, yesterdayKey } from '../engine/daily';
 import { LOCATIONS, LOCATION_BY_ID } from '../data/locations';
 import { COLLECTIONS } from '../data/collections';
@@ -173,20 +173,31 @@ export const useProgress = create<AtlasProgress>()(
       >;
 
       function snapshot(s: AtlasProgress): Snapshot {
-        return {
+        const prevStreak = s.streak.count;
+        const streak = touchedStreak(s.streak);
+        const next: Snapshot = {
           xp: s.xp,
           visited: s.visited,
           read: s.read,
           reflections: s.reflections ?? {},
           completedCollections: s.completedCollections,
           achievements: s.achievements,
-          streak: touchedStreak(s.streak),
+          streak,
           discoveriesMade: s.discoveriesMade,
           quizzesCompleted: s.quizzesCompleted,
           exploredLegends: s.exploredLegends ?? {},
           questProgress: s.questProgress ?? {},
           completedQuests: s.completedQuests ?? [],
         };
+        // Returning on a new day that hits 3 / 7 / 30 earns a streak gift.
+        if (streak.count > prevStreak) {
+          const bonus = STREAK_XP_MILESTONES[streak.count];
+          if (bonus) {
+            next.xp = gainXp(bonus, next);
+            toast({ titleKey: 'streakBonus', emoji: '🔥', xp: bonus });
+          }
+        }
+        return next;
       }
 
       /**
