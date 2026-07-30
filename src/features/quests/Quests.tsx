@@ -1,10 +1,20 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useT } from '../../i18n/useT';
-import { QUESTS } from '../../data/quests';
+import { QUESTS, type QuestKind } from '../../data/quests';
 import { LOCATIONS, LOCATION_BY_ID } from '../../data/locations';
 import { CATEGORY_BY_ID } from '../../data/categories';
 import { useProgress } from '../../state/store';
+import type { UiKey } from '../../i18n/strings';
+import QuestTrailPreview from './QuestTrailPreview';
+
+const KIND_LABEL: Record<QuestKind, UiKey> = {
+  pilgrimage: 'questKindPilgrimage',
+  learning: 'questKindLearning',
+  mountain: 'questKindMountain',
+  route: 'questKindRoute',
+  devotion: 'questKindDevotion',
+};
 
 function QuestGuessForm({
   questId,
@@ -126,6 +136,7 @@ export default function Quests() {
                   <div className="quest-head-text">
                     <div className="quest-name">
                       {L(q.name)}{' '}
+                      <span className="tag">{t(KIND_LABEL[q.kind])}</span>
                       {isComplete && <span className="tag gold">✓ {t('questComplete')}</span>}
                     </div>
                     <p className="quest-blurb">{L(q.blurb)}</p>
@@ -145,40 +156,49 @@ export default function Quests() {
               </button>
 
               {expanded && (
-                <ol className="quest-steps">
-                  {q.steps.map((step, i) => {
-                    const foundStep = done.has(step.id);
-                    const loc = LOCATION_BY_ID[step.id];
-                    return (
-                      <li key={step.id} className={foundStep ? 'found' : 'hidden-step'}>
-                        <div className="quest-step-row">
-                          <span className="quest-step-mark">{foundStep ? '✓' : '?'}</span>
-                          <div className="quest-step-body">
-                            {foundStep && loc ? (
-                              <>
-                                <div className="quest-step-name">
-                                  {CATEGORY_BY_ID[loc.category].emoji} {L(loc.name)}
-                                </div>
-                                <p className="quest-hint">{L(step.hint)}</p>
-                                <Link className="btn subtle quest-open-found" to={`/location/${step.id}`}>
-                                  {t('atlasOpenLocation')} →
-                                </Link>
-                              </>
-                            ) : (
-                              <>
-                                <div className="quest-step-name">
-                                  {t('questClue')} {i + 1}
-                                </div>
-                                <p className="quest-hint">{L(step.hint)}</p>
-                                <QuestGuessForm questId={q.id} correctId={step.id} />
-                              </>
-                            )}
+                <div className="quest-expanded">
+                  <div className="quest-trail-block" onClick={(e) => e.stopPropagation()}>
+                    <div className="quest-trail-label">{t('questTrailPreview')}</div>
+                    <QuestTrailPreview steps={q.steps} foundIds={done} />
+                    <Link className="btn secondary quest-show-trail" to={`/atlas?quest=${q.id}`}>
+                      🗺️ {t('questShowTrail')}
+                    </Link>
+                  </div>
+                  <ol className="quest-steps">
+                    {q.steps.map((step, i) => {
+                      const foundStep = done.has(step.id);
+                      const loc = LOCATION_BY_ID[step.id];
+                      return (
+                        <li key={step.id} className={foundStep ? 'found' : 'hidden-step'}>
+                          <div className="quest-step-row">
+                            <span className="quest-step-mark">{foundStep ? '✓' : '?'}</span>
+                            <div className="quest-step-body">
+                              {foundStep && loc ? (
+                                <>
+                                  <div className="quest-step-name">
+                                    {CATEGORY_BY_ID[loc.category].emoji} {L(loc.name)}
+                                  </div>
+                                  <p className="quest-hint">{L(step.hint)}</p>
+                                  <Link className="btn subtle quest-open-found" to={`/location/${step.id}`}>
+                                    {t('atlasOpenLocation')} →
+                                  </Link>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="quest-step-name">
+                                    {t('questClue')} {i + 1}
+                                  </div>
+                                  <p className="quest-hint">{L(step.hint)}</p>
+                                  <QuestGuessForm questId={q.id} correctId={step.id} />
+                                </>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ol>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </div>
               )}
             </div>
           );

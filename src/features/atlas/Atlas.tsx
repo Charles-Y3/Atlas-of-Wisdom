@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import GlobeMap from '../../components/map/GlobeMap';
+import GlobeMap, { type QuestTrailStop } from '../../components/map/GlobeMap';
+import ScrollHintRow from '../../components/ScrollHintRow';
 import { useT } from '../../i18n/useT';
 import { CATEGORIES, CATEGORY_BY_ID, TRADITION_BY_ID } from '../../data/categories';
 import { LOCATION_BY_ID } from '../../data/locations';
 import { LEGENDS, LEGEND_BY_ID } from '../../data/legends';
+import { QUEST_BY_ID } from '../../data/quests';
 import { useProgress, legendsUnlocked } from '../../state/store';
 import type { CategoryId } from '../../data/types';
 
@@ -20,8 +22,30 @@ export default function Atlas() {
   const visited = progress.visited;
   const unlocked = legendsUnlocked(progress);
   const legendsMode = params.get('legends') === '1' && unlocked;
+  const questId = params.get('quest');
+  const quest = questId ? QUEST_BY_ID[questId] : undefined;
 
   const visitedIds = useMemo(() => new Set(Object.keys(visited)), [visited]);
+  const foundSteps = useMemo(
+    () => new Set(quest ? progress.questProgress?.[quest.id]?.completedSteps ?? [] : []),
+    [quest, progress.questProgress],
+  );
+
+  const questTrail = useMemo((): QuestTrailStop[] | null => {
+    if (!quest || legendsMode) return null;
+    return quest.steps
+      .map((s, i) => {
+        const loc = LOCATION_BY_ID[s.id];
+        if (!loc) return null;
+        return {
+          id: s.id,
+          coords: loc.coords,
+          found: foundSteps.has(s.id),
+          index: i + 1,
+        };
+      })
+      .filter((s): s is QuestTrailStop => Boolean(s));
+  }, [quest, foundSteps, legendsMode]);
 
   const focusId = params.get('focus');
   const focus = useMemo(() => {
@@ -41,10 +65,19 @@ export default function Atlas() {
     if (!unlocked) return;
     const next = new URLSearchParams(params);
     if (legendsMode) next.delete('legends');
-    else next.set('legends', '1');
+    else {
+      next.set('legends', '1');
+      next.delete('quest');
+    }
     setParams(next, { replace: true });
     setSelectedId(null);
     setSelectedLegendId(null);
+  }
+
+  function clearQuestTrail() {
+    const next = new URLSearchParams(params);
+    next.delete('quest');
+    setParams(next, { replace: true });
   }
 
   return (
@@ -60,10 +93,11 @@ export default function Atlas() {
         focus={focus}
         onStyleModeChange={setStyleMode}
         legendsMode={legendsMode}
+        questTrail={questTrail}
       />
 
       <div className="map-chips">
-        <div className="chip-row">
+        <ScrollHintRow>
           {!legendsMode && (
             <>
               <button className={`chip ${filter === null ? 'active' : ''}`} onClick={() => setFilter(null)}>
@@ -88,7 +122,17 @@ export default function Atlas() {
             📜 {t('atlasLegends')}
             {!unlocked && ' 🔒'}
           </button>
-        </div>
+        </ScrollHintRow>
+        {quest && !legendsMode && (
+          <div className="map-quest-banner">
+            <span>
+              🛤️ {t('atlasQuestTrail')}: {L(quest.name)}
+            </span>
+            <button type="button" className="btn subtle" onClick={clearQuestTrail}>
+              {t('atlasClearQuestTrail')}
+            </button>
+          </div>
+        )}
         {legendsMode && <p className="map-legends-hint">{t('atlasLegendsHint')}</p>}
         {!unlocked && <p className="map-legends-hint">{t('atlasLegendsLocked')}</p>}
       </div>

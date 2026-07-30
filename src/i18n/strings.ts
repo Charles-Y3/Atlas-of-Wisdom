@@ -68,10 +68,17 @@ export const UI = {
   streakRitual3: localized('Three days on the path', '三日在路上'),
   streakRitual7: localized('A week of wonder', '一周的惊奇'),
   streakRitual30: localized('A month of seeking', '一月的求索'),
+  rankLadderTitle: localized('Explorer ranks', '探索者等级'),
+  rankLadderCurrent: localized('Current', '当前'),
+  rankLadderNeed: localized('{n} XP to reach', '还需 {n} 经验到达'),
+  rankLadderTap: localized('Tap a rank to learn more', '点按等级查看简介'),
+  scrollMoreHint: localized('Swipe for more', '向右滑动查看更多'),
 
   // ── Atlas ──────────────────────────────────────────────────────────
   atlasTitle: localized('World Atlas', '世界地图'),
   atlasAll: localized('All', '全部'),
+  atlasQuestTrail: localized('Quest trail', '旅程路线'),
+  atlasClearQuestTrail: localized('Clear trail', '清除路线'),
   atlasVisited: localized('explored', '已探索'),
   atlasNotVisited: localized('Not yet explored', '尚未探索'),
   atlasOpenLocation: localized('Explore this place', '探索此地'),
@@ -201,6 +208,13 @@ export const UI = {
     '不设路线——让地图集给你一个惊喜。',
   ),
   questNudge: localized('{n} clues left to find', '还剩 {n} 条线索待寻'),
+  questShowTrail: localized('Show trail on Atlas', '在地图上显示路线'),
+  questTrailPreview: localized('Trail', '路线'),
+  questKindPilgrimage: localized('Pilgrimage', '朝圣'),
+  questKindLearning: localized('Learning', '求学'),
+  questKindMountain: localized('Mountains', '山岳'),
+  questKindRoute: localized('Route', '通道'),
+  questKindDevotion: localized('Devotion', '虔敬'),
 
   // ── Collections ────────────────────────────────────────────────────
   collectionTitle: localized('Collections', '收藏'),
@@ -241,6 +255,11 @@ export const UI = {
   journalAllVirtues: localized('All', '全部'),
   journalExpand: localized('Show more', '展开'),
   journalCollapse: localized('Show less', '收起'),
+  reflectReopen: localized('Take a moment', '停一停'),
+  profileTabOverview: localized('Overview', '概览'),
+  profileTabJourney: localized('Journey', '旅途'),
+  profileTabAchievements: localized('Achievements', '成就'),
+  profileTabSettings: localized('Settings', '设置'),
 
   // ── Daily quiz ─────────────────────────────────────────────────────
   quizTitle: localized('Daily Quiz', '每日问答'),

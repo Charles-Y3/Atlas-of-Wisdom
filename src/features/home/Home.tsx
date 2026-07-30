@@ -13,11 +13,13 @@ import { useProgress, statsOf } from '../../state/store';
 import { rankForXp } from '../../engine/progression';
 import DailyQuiz from './DailyQuiz';
 import StreakRitual from '../profile/StreakRitual';
+import RankLadder from '../profile/RankLadder';
 
 export default function Home() {
   const { t, L, locale } = useT();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
+  const [rankOpen, setRankOpen] = useState(false);
   const progress = useProgress();
   const stats = statsOf(progress);
   const rank = rankForXp(progress.xp);
@@ -151,10 +153,10 @@ export default function Home() {
               <div className="stat-num">{stats.placesExplored}</div>
               <div className="stat-label">{t('homeExplored')}</div>
             </div>
-            <div className="stat-box">
+            <button type="button" className="stat-box stat-box-btn" onClick={() => setRankOpen(true)}>
               <div className="stat-num">{rank.emoji}</div>
               <div className="stat-label">{L(rank.name)}</div>
-            </div>
+            </button>
             <div className="stat-box">
               <div className="stat-num">{progress.xp}</div>
               <div className="stat-label">{t('profileXp')}</div>
@@ -244,6 +246,8 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <RankLadder xp={progress.xp} open={rankOpen} onClose={() => setRankOpen(false)} />
     </div>
   );
 }

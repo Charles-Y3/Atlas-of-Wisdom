@@ -6,6 +6,7 @@ import { CATEGORY_BY_ID, TRADITION_BY_ID } from '../../data/categories';
 import { VIRTUES, type VirtueId } from '../../data/virtues';
 import { useProgress } from '../../state/store';
 import type { AtlasLocation } from '../../data/types';
+import ScrollHintRow from '../../components/ScrollHintRow';
 
 export default function Discovery() {
   const { t, L } = useT();
@@ -49,24 +50,26 @@ export default function Discovery() {
       <p className="page-subtitle">{t('discoverSubtitle')}</p>
 
       <p className="discover-filter-label">{t('discoverFilterHint')}</p>
-      <div className="chip-row" style={{ marginBottom: 16 }}>
-        <button
-          type="button"
-          className={`chip ${virtueFilter === 'any' ? 'active' : ''}`}
-          onClick={() => setVirtueFilter('any')}
-        >
-          {t('discoverAnyVirtue')}
-        </button>
-        {VIRTUES.map((v) => (
+      <div style={{ marginBottom: 16 }}>
+        <ScrollHintRow>
           <button
-            key={v.id}
             type="button"
-            className={`chip ${virtueFilter === v.id ? 'active' : ''}`}
-            onClick={() => setVirtueFilter(v.id)}
+            className={`chip ${virtueFilter === 'any' ? 'active' : ''}`}
+            onClick={() => setVirtueFilter('any')}
           >
-            {v.emoji} {L(v.name)}
+            {t('discoverAnyVirtue')}
           </button>
-        ))}
+          {VIRTUES.map((v) => (
+            <button
+              key={v.id}
+              type="button"
+              className={`chip ${virtueFilter === v.id ? 'active' : ''}`}
+              onClick={() => setVirtueFilter(v.id)}
+            >
+              {v.emoji} {L(v.name)}
+            </button>
+          ))}
+        </ScrollHintRow>
       </div>
 
       <div className="discover-stage">

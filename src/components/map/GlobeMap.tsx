@@ -45,6 +45,13 @@ function colorExpression(): maplibregl.ExpressionSpecification {
   return ['match', ['get', 'category'], ...branches, 'legend', '#6b4f2a', '#b0b8c9'] as unknown as maplibregl.ExpressionSpecification;
 }
 
+export interface QuestTrailStop {
+  id: string;
+  coords: [number, number];
+  found: boolean;
+  index: number;
+}
+
 export interface GlobeMapProps {
   /** null = show all categories. */
   filterCategory?: CategoryId | null;
@@ -60,6 +67,38 @@ export interface GlobeMapProps {
   onStyleModeChange?: (mode: 'offline' | 'online') => void;
   /** Show disputed/legendary claim points instead of atlas locations. */
   legendsMode?: boolean;
+  /** Optional quest path drawn on the globe. */
+  questTrail?: QuestTrailStop[] | null;
+}
+
+function buildQuestTrailGeoJson(stops: QuestTrailStop[] | null | undefined) {
+  if (!stops || stops.length === 0) {
+    return {
+      line: { type: 'FeatureCollection' as const, features: [] as GeoJSON.Feature[] },
+      stops: { type: 'FeatureCollection' as const, features: [] as GeoJSON.Feature[] },
+    };
+  }
+  const coords = stops.map((s) => s.coords);
+  return {
+    line: {
+      type: 'FeatureCollection' as const,
+      features: [
+        {
+          type: 'Feature' as const,
+          geometry: { type: 'LineString' as const, coordinates: coords },
+          properties: {},
+        },
+      ],
+    },
+    stops: {
+      type: 'FeatureCollection' as const,
+      features: stops.map((s) => ({
+        type: 'Feature' as const,
+        geometry: { type: 'Point' as const, coordinates: s.coords },
+        properties: { id: s.id, found: s.found ? 1 : 0, index: s.index },
+      })),
+    },
+  };
 }
 
 type OverlayKind = 'cluster' | 'place' | 'country' | 'city';
@@ -137,6 +176,7 @@ export default function GlobeMap({
   locale,
   onStyleModeChange,
   legendsMode = false,
+  questTrail = null,
 }: GlobeMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -148,10 +188,12 @@ export default function GlobeMap({
   const visitedRef = useRef(visitedIds);
   const localeRef = useRef(locale);
   const legendsRef = useRef(legendsMode);
+  const trailRef = useRef(questTrail);
   filterRef.current = filterCategory;
   visitedRef.current = visitedIds;
   localeRef.current = locale;
   legendsRef.current = legendsMode;
+  trailRef.current = questTrail;
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
   const onStyleModeChangeRef = useRef(onStyleModeChange);
@@ -306,6 +348,45 @@ export default function GlobeMap({
         });
       }
 
+      const trailData = buildQuestTrailGeoJson(trailRef.current);
+      if (!map.getSource('quest-trail')) {
+        map.addSource('quest-trail', { type: 'geojson', data: trailData.line });
+      } else {
+        (map.getSource('quest-trail') as maplibregl.GeoJSONSource).setData(trailData.line);
+      }
+      if (!map.getSource('quest-stops')) {
+        map.addSource('quest-stops', { type: 'geojson', data: trailData.stops });
+      } else {
+        (map.getSource('quest-stops') as maplibregl.GeoJSONSource).setData(trailData.stops);
+      }
+      if (!map.getLayer('quest-trail-line')) {
+        map.addLayer({
+          id: 'quest-trail-line',
+          type: 'line',
+          source: 'quest-trail',
+          paint: {
+            'line-color': '#b08a3c',
+            'line-width': 2.5,
+            'line-opacity': 0.85,
+            'line-dasharray': [2, 1.5],
+          },
+        });
+      }
+      if (!map.getLayer('quest-stops-pts')) {
+        map.addLayer({
+          id: 'quest-stops-pts',
+          type: 'circle',
+          source: 'quest-stops',
+          paint: {
+            'circle-radius': ['case', ['==', ['get', 'found'], 1], 8, 6],
+            'circle-color': ['case', ['==', ['get', 'found'], 1], '#b08a3c', '#e8dcc4'],
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#6b4f2a',
+            'circle-opacity': ['case', ['==', ['get', 'found'], 1], 1, 0.7],
+          },
+        });
+      }
+
       syncOverlays();
     },
     [syncOverlays],
@@ -451,6 +532,32 @@ export default function GlobeMap({
     if (loadedRef.current) apply();
     else map.once('style.load', apply);
   }, [filterCategory, visitedIds, locale, legendsMode, syncOverlays]);
+
+  // ── Quest trail updates ────────────────────────────────────────────
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const apply = () => {
+      const data = buildQuestTrailGeoJson(questTrail);
+      const line = map.getSource('quest-trail') as maplibregl.GeoJSONSource | undefined;
+      const stops = map.getSource('quest-stops') as maplibregl.GeoJSONSource | undefined;
+      line?.setData(data.line);
+      stops?.setData(data.stops);
+      if (questTrail && questTrail.length > 0) {
+        const lngs = questTrail.map((s) => s.coords[0]);
+        const lats = questTrail.map((s) => s.coords[1]);
+        map.fitBounds(
+          [
+            [Math.min(...lngs) - 8, Math.min(...lats) - 6],
+            [Math.max(...lngs) + 8, Math.max(...lats) + 6],
+          ],
+          { padding: 48, duration: 1400, maxZoom: 3.8 },
+        );
+      }
+    };
+    if (loadedRef.current) apply();
+    else map.once('style.load', apply);
+  }, [questTrail]);
 
   // ── Focus flights ──────────────────────────────────────────────────
   useEffect(() => {

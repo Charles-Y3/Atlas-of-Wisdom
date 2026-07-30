@@ -10,10 +10,13 @@ export interface QuestStep {
   hint: Localized<string>;
 }
 
+export type QuestKind = 'pilgrimage' | 'learning' | 'mountain' | 'route' | 'devotion';
+
 export interface QuestDef {
   id: string;
   name: Localized<string>;
   emoji: string;
+  kind: QuestKind;
   blurb: Localized<string>;
   steps: QuestStep[];
 }
@@ -23,6 +26,7 @@ export const QUESTS: QuestDef[] = [
     id: 'path-of-compassion',
     name: localized('Path of Compassion', '慈悲之路'),
     emoji: '🪷',
+    kind: 'pilgrimage',
     blurb: localized(
       'Follow four clues along an early path of awakening. Name each place when you know it — visiting a pin alone does not count.',
       '循着四条与早期觉悟之路相关的线索。认得出时点出地名——仅打开标记不算。',
@@ -62,6 +66,7 @@ export const QUESTS: QuestDef[] = [
     id: 'way-of-learning',
     name: localized('Way of Learning', '求学之路'),
     emoji: '📚',
+    kind: 'learning',
     blurb: localized(
       'Hunt for academies and libraries where minds met across centuries. Clues only — search the globe.',
       '寻访那些跨越世纪、心灵相遇的书院与图书馆。只有线索——请在地球上搜索。',
@@ -101,6 +106,7 @@ export const QUESTS: QuestDef[] = [
     id: 'confucian-trail',
     name: localized('Confucian Trail', '儒门足迹'),
     emoji: '📖',
+    kind: 'learning',
     blurb: localized(
       'Trace a teacher’s homeland and the academies that kept his thought alive — without being told where to go.',
       '追随一位夫子的故乡与延续其思想的书院——但不直接告诉你去哪里。',
@@ -140,6 +146,7 @@ export const QUESTS: QuestDef[] = [
     id: 'mountain-pilgrimage',
     name: localized('Mountain Pilgrimage', '山岳朝圣'),
     emoji: '🏔️',
+    kind: 'mountain',
     blurb: localized(
       'Four peaks and cliff-side sanctuaries. Read the hints, then find them on the spinning globe.',
       '四座山峰与悬崖上的圣地。读线索，再在旋转的地球上找到它们。',
@@ -179,6 +186,7 @@ export const QUESTS: QuestDef[] = [
     id: 'silk-road-echoes',
     name: localized('Silk Road Echoes', '丝路回响'),
     emoji: '🐪',
+    kind: 'route',
     blurb: localized(
       'Ideas travelled these corridors. Follow whispers of caves, caravanserais, and translation houses.',
       '思想曾沿着这些走廊旅行。追随石窟、商队驿站与翻译之所的低语。',
@@ -218,6 +226,7 @@ export const QUESTS: QuestDef[] = [
     id: 'houses-of-devotion',
     name: localized('Houses of Devotion', '虔敬之屋'),
     emoji: '🕯️',
+    kind: 'devotion',
     blurb: localized(
       'Places built for prayer and service. The map holds them; the hints only point the way.',
       '为祈祷与奉献而建的地方。地图上有它们；线索只指方向。',
@@ -254,3 +263,7 @@ export const QUESTS: QuestDef[] = [
     ],
   },
 ];
+
+export const QUEST_BY_ID: Record<string, QuestDef> = Object.fromEntries(
+  QUESTS.map((q) => [q.id, q]),
+);

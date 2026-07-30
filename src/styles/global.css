@@ -157,6 +157,39 @@ button {
 }
 .chip-row::-webkit-scrollbar { display: none; }
 
+.scroll-hint-wrap {
+  position: relative;
+}
+.scroll-hint-wrap.has-hint .chip-row {
+  mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 48px), transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 48px), transparent 100%);
+}
+.scroll-hint {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 6px 0 28px;
+  background: linear-gradient(90deg, transparent, var(--paper) 40%);
+  pointer-events: none;
+  color: var(--gold-deep);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.scroll-hint-chevron {
+  font-size: 18px;
+  line-height: 1;
+  animation: scroll-hint-pulse 1.4s ease-in-out infinite;
+}
+@keyframes scroll-hint-pulse {
+  0%, 100% { transform: translateX(0); opacity: 0.7; }
+  50% { transform: translateX(3px); opacity: 1; }
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -562,6 +595,138 @@ button {
 }
 .stat-num { font-size: 20px; font-weight: 700; font-family: var(--font-display); color: var(--gold-deep); }
 .stat-label { font-size: 11px; color: var(--ink-soft); }
+.stat-box-btn {
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  appearance: none;
+}
+.stat-box-btn:hover {
+  border-color: var(--gold);
+}
+
+.rank-ladder-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(43, 36, 22, 0.35);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.rank-ladder-sheet {
+  position: relative;
+  width: min(100%, 520px);
+  max-height: 78vh;
+  overflow-y: auto;
+  margin: 0;
+  border-radius: 18px 18px 0 0;
+}
+.rank-ladder-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rank-ladder-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: var(--paper-deep);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+}
+.rank-ladder-row.current { border-color: var(--gold); }
+.rank-ladder-row.active { background: #f7ecd4; border-color: var(--gold); }
+.rank-ladder-row.locked { opacity: 0.55; }
+.rank-ladder-emoji { font-size: 22px; }
+.rank-ladder-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.rank-ladder-name {
+  font-weight: 700;
+  font-family: var(--font-display);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.rank-ladder-xp { font-size: 12px; color: var(--ink-soft); }
+.rank-ladder-blurb {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f4ead2;
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+}
+.rank-ladder-blurb-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.rank-ladder-blurb p { margin: 0; font-size: 14px; line-height: 1.45; }
+
+.rank-card-open {
+  display: block;
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0 0 8px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+}
+
+.map-quest-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: rgba(246, 240, 226, 0.92);
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.quest-trail-block {
+  margin: 10px 0 4px;
+  padding: 10px;
+  background: var(--paper-deep);
+  border: 1px dashed rgba(176, 138, 60, 0.45);
+  border-radius: 12px;
+}
+.quest-trail-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold-deep);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.quest-trail-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.quest-show-trail {
+  margin-top: 8px;
+  width: 100%;
+  font-size: 13px;
+  padding: 8px 12px;
+}
+
+.reflect-reopen { width: 100%; }
 
 /* ── Location page ─────────────────────────────────────────────────── */
 

@@ -40,7 +40,15 @@ export default function ReflectionCard({ location }: { location: AtlasLocation }
     );
   }
 
-  if (dismissed) return null;
+  if (dismissed) {
+    return (
+      <div className="section">
+        <button type="button" className="btn secondary reflect-reopen" onClick={() => setDismissed(false)}>
+          🪞 {t('reflectReopen')}
+        </button>
+      </div>
+    );
+  }
 
   const remaining = MIN_REFLECTION_CHARS - text.trim().length;
 
