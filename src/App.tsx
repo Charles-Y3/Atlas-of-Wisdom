@@ -20,7 +20,7 @@ function Shell() {
   const tabs = [
     { to: '/', emoji: '🏠', label: t('navHome') },
     { to: '/atlas', emoji: '🗺️', label: t('navAtlas') },
-    { to: '/discover', emoji: '🎲', label: t('navDiscover') },
+    { to: '/discover', emoji: '🔭', label: t('navDiscover') },
     { to: '/quests', emoji: '🛤️', label: t('navQuests') },
     { to: '/collection', emoji: '🗃️', label: t('navCollection') },
     { to: '/profile', emoji: '🧭', label: t('navProfile') },

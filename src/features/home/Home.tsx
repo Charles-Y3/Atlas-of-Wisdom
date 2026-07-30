@@ -6,10 +6,13 @@ import { LOCATIONS, LOCATION_BY_ID } from '../../data/locations';
 import { PEOPLE } from '../../data/people';
 import { CATEGORY_BY_ID, TRADITION_BY_ID } from '../../data/categories';
 import { LOCATION_TEACHINGS } from '../../data/teachings';
-import { pickIndex, todayKey } from '../../engine/daily';
+import { QUESTS } from '../../data/quests';
+import { formatYear } from '../../data/types';
+import { monthKey, onThisDayPick, pickIndex, todayKey } from '../../engine/daily';
 import { useProgress, statsOf } from '../../state/store';
 import { rankForXp } from '../../engine/progression';
 import DailyQuiz from './DailyQuiz';
+import StreakRitual from '../profile/StreakRitual';
 
 export default function Home() {
   const { t, L, locale } = useT();
@@ -30,6 +33,30 @@ export default function Home() {
     const id = teachingIds[idx];
     return { id, teaching: LOCATION_TEACHINGS[id], loc: LOCATION_BY_ID[id] };
   }, [teachingIds]);
+
+  const onThisDay = useMemo(() => {
+    const corpus = LOCATIONS.flatMap((l) =>
+      l.timeline.map((e, eventIndex) => ({ locId: l.id, year: e.year, eventIndex })),
+    );
+    const pick = onThisDayPick(corpus);
+    if (!pick) return null;
+    const loc = LOCATION_BY_ID[pick.locId];
+    const event = loc?.timeline[pick.eventIndex];
+    if (!loc || !event) return null;
+    return { loc, year: pick.year, event };
+  }, []);
+
+  const questOfMonth = useMemo(() => {
+    const idx = pickIndex(`questMonth:${monthKey()}`, QUESTS.length);
+    return QUESTS[idx];
+  }, []);
+
+  const greeting =
+    stats.placesExplored === 0
+      ? t('homeGreetingFirst')
+      : stats.streak >= 3
+        ? t('homeGreetingStreak')
+        : t('homeGreetingReturn');
 
   const lastLocation = progress.lastLocationId ? LOCATION_BY_ID[progress.lastLocationId] : null;
 
@@ -65,6 +92,7 @@ export default function Home() {
         <div className="home-hero-overlay">
           <h1 className="display">{t('appName')}</h1>
           <p>{t('appTagline')}</p>
+          <p className="home-greeting">{greeting}</p>
         </div>
       </div>
 
@@ -116,6 +144,8 @@ export default function Home() {
         )}
 
         <div className="home-grid">
+          <StreakRitual count={stats.streak} />
+
           <div className="stat-strip">
             <div className="stat-box">
               <div className="stat-num">{stats.placesExplored}</div>
@@ -126,8 +156,8 @@ export default function Home() {
               <div className="stat-label">{L(rank.name)}</div>
             </div>
             <div className="stat-box">
-              <div className="stat-num">{stats.streak}</div>
-              <div className="stat-label">{t('profileStreak')}</div>
+              <div className="stat-num">{progress.xp}</div>
+              <div className="stat-label">{t('profileXp')}</div>
             </div>
           </div>
 
@@ -168,6 +198,27 @@ export default function Home() {
             </Link>
           )}
 
+          {onThisDay && (
+            <Link to={`/location/${onThisDay.loc.id}`} className="card feature-card">
+              <div className="feature-kicker">📅 {t('homeOnThisDay')}</div>
+              <h3 className="feature-title">
+                {formatYear(onThisDay.year, locale)} · {L(onThisDay.loc.name)}
+              </h3>
+              <p className="feature-sub">{L(onThisDay.event.event)}</p>
+              <p className="feature-sub">{t('homeOnThisDaySub')}</p>
+            </Link>
+          )}
+
+          {questOfMonth && (
+            <Link to="/quests" className="card feature-card">
+              <div className="feature-kicker">🛤️ {t('homeQuestOfMonth')}</div>
+              <h3 className="feature-title">
+                {questOfMonth.emoji} {L(questOfMonth.name)}
+              </h3>
+              <p className="feature-sub">{t('homeQuestOfMonthSub')}</p>
+            </Link>
+          )}
+
           <DailyQuiz />
 
           {lastLocation && (
@@ -185,7 +236,7 @@ export default function Home() {
               🗺️ {t('homeStartExploring')}
             </Link>
             <Link to="/discover" className="btn secondary" style={{ flex: 1, minWidth: 120 }}>
-              🎲 {t('navDiscover')}
+              🔭 {t('navDiscover')}
             </Link>
             <Link to="/quests" className="btn secondary" style={{ flex: 1, minWidth: 120 }}>
               🛤️ {t('navQuests')}

@@ -6,13 +6,19 @@ import { ACHIEVEMENTS } from '../../data/achievements';
 import { rankForXp, nextRankForXp } from '../../engine/progression';
 import { useProgress, statsOf } from '../../state/store';
 import VirtueCompass from './VirtueCompass';
+import StreakRitual from './StreakRitual';
+import ReflectionsJournal from './ReflectionsJournal';
+import { exportPassportPng } from './exportPassport';
 
 export default function Profile() {
-  const { t, L } = useT();
-  const locale = useLocale((s) => s.locale);
+  const { t, L, locale } = useT();
   const setLocale = useLocale((s) => s.setLocale);
   const detailedMap = useSettings((s) => s.detailedMapWhenOnline);
   const setDetailedMap = useSettings((s) => s.setDetailedMapWhenOnline);
+  const younger = useSettings((s) => s.youngerExplorer);
+  const setYounger = useSettings((s) => s.setYoungerExplorer);
+  const sound = useSettings((s) => s.soundEnabled);
+  const setSound = useSettings((s) => s.setSoundEnabled);
   const progress = useProgress();
   const stats = statsOf(progress);
   const rank = rankForXp(progress.xp);
@@ -31,6 +37,8 @@ export default function Profile() {
       <h1 className="page-title">🧭 {t('profileTitle')}</h1>
       <p className="page-subtitle">{t('profileAbout')}</p>
 
+      <StreakRitual count={stats.streak} />
+
       <div className="card rank-card">
         <div className="rank-emoji">{rank.emoji}</div>
         <div className="rank-name">{L(rank.name)}</div>
@@ -46,6 +54,25 @@ export default function Profile() {
             </>
           )}
         </div>
+        <button
+          type="button"
+          className="btn secondary"
+          style={{ marginTop: 14 }}
+          onClick={() =>
+            exportPassportPng(
+              {
+                xp: progress.xp,
+                streak: progress.streak,
+                read: progress.read,
+                completedCollections: progress.completedCollections,
+              },
+              locale,
+              t('appName'),
+            )
+          }
+        >
+          🛂 {t('profileExportPassport')}
+        </button>
       </div>
 
       <div className="section">
@@ -71,6 +98,8 @@ export default function Profile() {
       </div>
 
       <VirtueCompass />
+
+      <ReflectionsJournal />
 
       <div className="section">
         <h2>{t('profileAchievements')}</h2>
@@ -111,6 +140,28 @@ export default function Profile() {
         </label>
         <p className="page-subtitle" style={{ marginTop: 6 }}>
           {t('settingsDetailedMapHint')}
+        </p>
+        <label className="settings-toggle" style={{ marginTop: 14 }}>
+          <input
+            type="checkbox"
+            checked={younger}
+            onChange={(e) => setYounger(e.target.checked)}
+          />
+          <span>{t('settingsYounger')}</span>
+        </label>
+        <p className="page-subtitle" style={{ marginTop: 6 }}>
+          {t('settingsYoungerHint')}
+        </p>
+        <label className="settings-toggle" style={{ marginTop: 14 }}>
+          <input
+            type="checkbox"
+            checked={sound}
+            onChange={(e) => setSound(e.target.checked)}
+          />
+          <span>{t('settingsSound')}</span>
+        </label>
+        <p className="page-subtitle" style={{ marginTop: 6 }}>
+          {t('settingsSoundHint')}
         </p>
       </div>
 

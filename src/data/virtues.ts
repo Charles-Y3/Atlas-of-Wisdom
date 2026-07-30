@@ -26,6 +26,8 @@ export interface Virtue {
   blurb: Localized<string>;
   /** Open question offered after finishing a story tagged with this virtue. */
   reflection: Localized<string>;
+  /** Simpler prompt when Younger explorer mode is on. */
+  reflectionYoung: Localized<string>;
 }
 
 export const VIRTUES: Virtue[] = [
@@ -41,6 +43,10 @@ export const VIRTUES: Virtue[] = [
       'What is one thing you believed a year ago that you see differently now?',
       '有什么是你一年前深信不疑、如今却看法不同的？',
     ),
+    reflectionYoung: localized(
+      'What is something new you learned this week?',
+      '这一周你学到了什么新东西？',
+    ),
   },
   {
     id: 'compassion',
@@ -53,6 +59,10 @@ export const VIRTUES: Virtue[] = [
     reflection: localized(
       'Who in your life could use kindness this week, and what would it cost you to offer it?',
       '这一周里，你身边谁需要一份善意？给出它，你需要付出什么？',
+    ),
+    reflectionYoung: localized(
+      'Who could you be kind to today?',
+      '今天你可以对谁善良一点？',
     ),
   },
   {
@@ -67,6 +77,10 @@ export const VIRTUES: Virtue[] = [
       'What would you attempt if you knew no one would judge the outcome?',
       '如果没有人评判结果，你会去尝试什么？',
     ),
+    reflectionYoung: localized(
+      'What brave thing would you like to try?',
+      '你想勇敢地试一试什么？',
+    ),
   },
   {
     id: 'humility',
@@ -79,6 +93,10 @@ export const VIRTUES: Virtue[] = [
     reflection: localized(
       'When did you last say "I do not know" — and what happened after?',
       '你上一次说“我不知道”是什么时候？之后发生了什么？',
+    ),
+    reflectionYoung: localized(
+      'When was it okay to say “I don’t know”?',
+      '什么时候说“我不知道”其实没关系？',
     ),
   },
   {
@@ -93,6 +111,10 @@ export const VIRTUES: Virtue[] = [
       'What do you give your time to most freely? Is that what you would choose?',
       '你最心甘情愿把时间给了什么？那是你会选择的吗？',
     ),
+    reflectionYoung: localized(
+      'What do you love spending time on?',
+      '你最喜欢把时间花在什么上？',
+    ),
   },
   {
     id: 'perseverance',
@@ -105,6 +127,10 @@ export const VIRTUES: Virtue[] = [
     reflection: localized(
       'What are you building slowly that will not be finished this year?',
       '你正在缓慢建造什么，而它今年不会完成？',
+    ),
+    reflectionYoung: localized(
+      'What are you practising that takes many tries?',
+      '你在练习什么需要很多次才能做好的事？',
     ),
   },
   {
@@ -119,6 +145,10 @@ export const VIRTUES: Virtue[] = [
       'Where in your life are you holding a tension that does not need to be resolved, only balanced?',
       '你生活中有什么张力，其实无需解决，只需平衡？',
     ),
+    reflectionYoung: localized(
+      'How do you help friends get along?',
+      '你怎样帮助朋友们好好相处？',
+    ),
   },
   {
     id: 'justice',
@@ -132,6 +162,10 @@ export const VIRTUES: Virtue[] = [
       'What small unfairness have you grown used to overlooking?',
       '有什么细小的不公，你已习惯视而不见？',
     ),
+    reflectionYoung: localized(
+      'When have you seen something unfair, and what did you do?',
+      '你见过什么不公平的事？你做了什么？',
+    ),
   },
   {
     id: 'wonder',
@@ -144,6 +178,10 @@ export const VIRTUES: Virtue[] = [
     reflection: localized(
       'When did something last stop you in your tracks? What made it worth pausing for?',
       '上一次让你驻足的是什么？它为何值得停下？',
+    ),
+    reflectionYoung: localized(
+      'What made you say “wow” lately?',
+      '最近什么事让你忍不住说“哇”？',
     ),
   },
 ];

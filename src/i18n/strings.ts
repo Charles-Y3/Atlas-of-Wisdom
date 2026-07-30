@@ -14,6 +14,18 @@ export const UI = {
     "Discover the places that shaped humanity's wisdom.",
     '探索塑造人类智慧的地方。',
   ),
+  homeGreetingFirst: localized(
+    'The atlas is open. Where will you look first?',
+    '地图集已打开。你想先望向何处？',
+  ),
+  homeGreetingReturn: localized(
+    'Welcome back, explorer. Another place is waiting.',
+    '欢迎回来，探索者。又有一处在等你。',
+  ),
+  homeGreetingStreak: localized(
+    'Your journey continues — the path remembers your steps.',
+    '旅途仍在继续——这条路记得你的脚步。',
+  ),
 
   navHome: localized('Home', '首页'),
   navAtlas: localized('Atlas', '地图'),
@@ -45,6 +57,17 @@ export const UI = {
   homeSearchNoResults: localized('No matches found. Try another word.', '未找到匹配。换个词试试。'),
   homeSearchPeople: localized('People', '人物'),
   homeSearchPlaces: localized('Places', '地点'),
+  homeOnThisDay: localized('On This Day', '历史上的今日'),
+  homeOnThisDaySub: localized(
+    'A moment from the atlas, chosen for today.',
+    '今日从地图集中拣选的一则往事。',
+  ),
+  homeQuestOfMonth: localized('Quest of the Month', '本月旅程'),
+  homeQuestOfMonthSub: localized("This month's pilgrimage", '本月的朝圣之路'),
+  streakRitual: localized('{n}-day journey', '{n} 日之旅'),
+  streakRitual3: localized('Three days on the path', '三日在路上'),
+  streakRitual7: localized('A week of wonder', '一周的惊奇'),
+  streakRitual30: localized('A month of seeking', '一月的求索'),
 
   // ── Atlas ──────────────────────────────────────────────────────────
   atlasTitle: localized('World Atlas', '世界地图'),
@@ -79,6 +102,16 @@ export const UI = {
   settingsDetailedMapHint: localized(
     'Streams vector tiles over the network. Off by default so the app never quietly uses cellular data.',
     '会通过网络加载矢量瓦片。默认关闭，以免应用悄悄消耗流量。',
+  ),
+  settingsYounger: localized('Younger explorer', '少年探索者'),
+  settingsYoungerHint: localized(
+    'Shorter stories and simpler reflection questions.',
+    '更短的故事，更简单的反思问题。',
+  ),
+  settingsSound: localized('Celebration sounds', '庆祝音效'),
+  settingsSoundHint: localized(
+    'A soft chime when you rank up or unlock an achievement. Off by default.',
+    '晋级或解锁成就时轻响一声。默认关闭。',
   ),
 
   // ── Location page ──────────────────────────────────────────────────
@@ -142,23 +175,32 @@ export const UI = {
   discoverRevealing: localized('Travelling…', '旅行中…'),
   discoverNew: localized('New place!', '新地点！'),
   discoverSeen: localized('You have been here before', '你来过这里'),
+  discoverAnyVirtue: localized('Any', '全部'),
+  discoverFilterHint: localized('Prefer places of…', '偏好这些德行的地方…'),
 
   // ── Quests ─────────────────────────────────────────────────────────
   questsTitle: localized('Quests', '旅程'),
   questsSubtitle: localized(
-    'Clues only — find each place on the Atlas yourself. Names stay hidden until you arrive.',
-    '只有线索——自己在地图上寻访每一处。抵达前不显示地名。',
+    'Read each clue, then name the place — filter by country if it helps. Visiting a pin alone does not count.',
+    '读懂每条线索，再点出地名——可按国家筛选。仅打开地图标记不算找到。',
   ),
   questProgress: localized('found', '已找到'),
-  questComplete: localized('Quest complete', '旅程完成'),
+  questComplete: localized('A pilgrimage complete', '一段朝圣之路完成了'),
   questStepDone: localized('Place found!', '找到了！'),
   questClue: localized('Clue', '线索'),
   questSearchAtlas: localized('Search the Atlas', '打开地图寻找'),
+  questGuessCountry: localized('Country', '国家'),
+  questGuessPlace: localized('Place', '地点'),
+  questGuessSubmit: localized('This is the place', '就是这里'),
+  questGuessWrong: localized('Not quite — try another place.', '不太对——换一处再试。'),
+  questGuessPickCountry: localized('Choose a country…', '选择国家…'),
+  questGuessPickPlace: localized('Choose a place…', '选择地点…'),
   questSerendipityTitle: localized('Serendipity', '偶遇'),
   questSerendipityBlurb: localized(
     'No path planned — let the atlas surprise you.',
     '不设路线——让地图集给你一个惊喜。',
   ),
+  questNudge: localized('{n} clues left to find', '还剩 {n} 条线索待寻'),
 
   // ── Collections ────────────────────────────────────────────────────
   collectionTitle: localized('Collections', '收藏'),
@@ -172,6 +214,7 @@ export const UI = {
   collectionLocked: localized('Keep exploring to reveal this collection.', '继续探索以揭开这个收藏。'),
   collectionTabPlaces: localized('Places', '地点'),
   collectionTabVirtues: localized('Virtues', '德行'),
+  collectionNudge: localized('{n} more to complete', '还差 {n} 处即可集齐'),
 
   // ── Profile / progression ──────────────────────────────────────────
   profileTitle: localized('Explorer Profile', '探索者档案'),
@@ -189,6 +232,15 @@ export const UI = {
   profileReset: localized('Reset exploration progress', '重置探索进度'),
   profileResetConfirm: localized('This erases all your discoveries, XP and achievements. Are you sure?', '这将清除你的全部发现、经验与成就。确定吗？'),
   profileAbout: localized('Part of the Great Harmony suite', '大同系列应用之一'),
+  profileExportPassport: localized('Export passport', '导出探索护照'),
+  journalTitle: localized('My Reflections', '我的反思'),
+  journalEmpty: localized(
+    'Finish a story and take a moment to reflect — your words stay here, private and local.',
+    '读完一则故事后停下来反思——你写下的话只会留在本地，仅你可见。',
+  ),
+  journalAllVirtues: localized('All', '全部'),
+  journalExpand: localized('Show more', '展开'),
+  journalCollapse: localized('Show less', '收起'),
 
   // ── Daily quiz ─────────────────────────────────────────────────────
   quizTitle: localized('Daily Quiz', '每日问答'),
@@ -205,8 +257,8 @@ export const UI = {
 
   // ── XP toasts ──────────────────────────────────────────────────────
   xpGained: localized('XP gained', '获得经验'),
-  rankUp: localized('Rank up!', '晋级！'),
-  achievementUnlocked: localized('Achievement unlocked', '成就解锁'),
+  rankUp: localized('A new rank on the path', '路上又进一阶'),
+  achievementUnlocked: localized('A milestone along the way', '途中又一个里程碑'),
   collectionCompleted: localized('Collection complete', '收藏集齐'),
 
   // ── Legends ────────────────────────────────────────────────────────

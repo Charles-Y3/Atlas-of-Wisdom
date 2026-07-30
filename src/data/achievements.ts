@@ -76,7 +76,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'serendipity',
     name: localized('Serendipity', '妙手偶得'),
-    emoji: '🎲',
+    emoji: '🔭',
     description: localized('Make ten random discoveries.', '完成十次随机发现。'),
     check: (s) => s.discoveriesMade >= 10,
   },

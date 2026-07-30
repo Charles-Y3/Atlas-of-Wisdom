@@ -3,6 +3,7 @@ import { useT } from '../../i18n/useT';
 import { VIRTUE_BY_ID } from '../../data/virtues';
 import type { AtlasLocation } from '../../data/types';
 import { useProgress, MIN_REFLECTION_CHARS } from '../../state/store';
+import { useSettings } from '../../state/settingsStore';
 
 /**
  * Shown once a place's story has been read: one open question drawn from
@@ -14,11 +15,15 @@ export default function ReflectionCard({ location }: { location: AtlasLocation }
   const { t, L } = useT();
   const existing = useProgress((s) => s.reflections?.[location.id]);
   const submitReflection = useProgress((s) => s.submitReflection);
+  const younger = useSettings((s) => s.youngerExplorer);
   const [text, setText] = useState('');
   const [dismissed, setDismissed] = useState(false);
 
   const virtue = VIRTUE_BY_ID[location.virtues[0]];
   if (!virtue) return null;
+
+  const promptFor = (v: typeof virtue) =>
+    L(younger ? v.reflectionYoung : v.reflection);
 
   if (existing) {
     const shown = VIRTUE_BY_ID[existing.virtue] ?? virtue;
@@ -27,7 +32,7 @@ export default function ReflectionCard({ location }: { location: AtlasLocation }
         <h2>{t('reflectYours')}</h2>
         <div className="reflection-saved">
           <div className="reflection-q">
-            {shown.emoji} {L(shown.reflection)}
+            {shown.emoji} {promptFor(shown)}
           </div>
           <p className="reflection-text">{existing.text}</p>
         </div>
@@ -45,7 +50,7 @@ export default function ReflectionCard({ location }: { location: AtlasLocation }
       <div className="reflection-card">
         <p className="reflection-intro">{t('reflectIntro')}</p>
         <div className="reflection-q">
-          {virtue.emoji} {L(virtue.reflection)}
+          {virtue.emoji} {promptFor(virtue)}
         </div>
         <textarea
           className="reflection-input"

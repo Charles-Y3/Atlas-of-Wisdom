@@ -2,7 +2,7 @@ import { localized, type Localized } from '../i18n/types';
 
 /**
  * Hint-driven pilgrimages: each stop shows a clue only — never the place
- * name or a deep link — until the explorer finds it on the Atlas (visit).
+ * name — until the explorer confirms it via the guess form (country + place).
  */
 export interface QuestStep {
   /** Secret target location id — never shown until found. */
@@ -24,8 +24,8 @@ export const QUESTS: QuestDef[] = [
     name: localized('Path of Compassion', '慈悲之路'),
     emoji: '🪷',
     blurb: localized(
-      'Follow four clues along an early path of awakening. Find each place on the Atlas — the name stays hidden until you arrive.',
-      '循着四条与早期觉悟之路相关的线索。在地图上寻访每一处——名字在抵达前保密。',
+      'Follow four clues along an early path of awakening. Name each place when you know it — visiting a pin alone does not count.',
+      '循着四条与早期觉悟之路相关的线索。认得出时点出地名——仅打开标记不算。',
     ),
     steps: [
       {

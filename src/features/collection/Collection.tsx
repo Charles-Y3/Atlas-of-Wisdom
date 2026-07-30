@@ -77,6 +77,14 @@ export default function Collection() {
             <div className="progress-label">
               {legendsGot.length} / {LEGEND_COLLECTION.totalCount} {t('collectionProgress')}
             </div>
+            {!legendsComplete && (
+              <p className="nudge-line">
+                {t('collectionNudge').replace(
+                  '{n}',
+                  String(LEGEND_COLLECTION.totalCount - legendsGot.length),
+                )}
+              </p>
+            )}
             <div className="coll-members">
               {LEGENDS.map((m) =>
                 exploredIds.has(m.id) ? (
@@ -119,6 +127,11 @@ export default function Collection() {
                 <div className="progress-label">
                   {got.length} / {members.length} {t('collectionProgress')}
                 </div>
+                {!complete && (
+                  <p className="nudge-line">
+                    {t('collectionNudge').replace('{n}', String(members.length - got.length))}
+                  </p>
+                )}
                 <div className="coll-members">
                   {members.map((m) =>
                     earned.has(m.id) ? (

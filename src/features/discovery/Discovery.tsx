@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useT } from '../../i18n/useT';
 import { LOCATIONS } from '../../data/locations';
 import { CATEGORY_BY_ID, TRADITION_BY_ID } from '../../data/categories';
+import { VIRTUES, type VirtueId } from '../../data/virtues';
 import { useProgress } from '../../state/store';
 import type { AtlasLocation } from '../../data/types';
 
@@ -10,6 +11,7 @@ export default function Discovery() {
   const { t, L } = useT();
   const [revealed, setRevealed] = useState<AtlasLocation | null>(null);
   const [spinning, setSpinning] = useState(false);
+  const [virtueFilter, setVirtueFilter] = useState<VirtueId | 'any'>('any');
   const visited = useProgress((s) => s.visited);
   const recordDiscovery = useProgress((s) => s.recordDiscovery);
 
@@ -17,9 +19,20 @@ export default function Discovery() {
     if (spinning) return;
     setSpinning(true);
     setRevealed(null);
-    // Prefer unvisited places so Discovery keeps opening new doors.
-    const unvisited = LOCATIONS.filter((l) => !visited[l.id]);
-    const pool = unvisited.length > 0 ? unvisited : LOCATIONS;
+    let pool = LOCATIONS;
+    if (virtueFilter !== 'any') {
+      const matching = LOCATIONS.filter((l) => l.virtues.includes(virtueFilter));
+      const unvisitedMatching = matching.filter((l) => !visited[l.id]);
+      pool =
+        unvisitedMatching.length > 0
+          ? unvisitedMatching
+          : matching.length > 0
+            ? matching
+            : LOCATIONS;
+    } else {
+      const unvisited = LOCATIONS.filter((l) => !visited[l.id]);
+      pool = unvisited.length > 0 ? unvisited : LOCATIONS;
+    }
     const pick = pool[Math.floor(Math.random() * pool.length)];
     setTimeout(() => {
       setSpinning(false);
@@ -32,8 +45,29 @@ export default function Discovery() {
 
   return (
     <div className="page">
-      <h1 className="page-title">🎲 {t('discoverTitle')}</h1>
+      <h1 className="page-title">🔭 {t('discoverTitle')}</h1>
       <p className="page-subtitle">{t('discoverSubtitle')}</p>
+
+      <p className="discover-filter-label">{t('discoverFilterHint')}</p>
+      <div className="chip-row" style={{ marginBottom: 16 }}>
+        <button
+          type="button"
+          className={`chip ${virtueFilter === 'any' ? 'active' : ''}`}
+          onClick={() => setVirtueFilter('any')}
+        >
+          {t('discoverAnyVirtue')}
+        </button>
+        {VIRTUES.map((v) => (
+          <button
+            key={v.id}
+            type="button"
+            className={`chip ${virtueFilter === v.id ? 'active' : ''}`}
+            onClick={() => setVirtueFilter(v.id)}
+          >
+            {v.emoji} {L(v.name)}
+          </button>
+        ))}
+      </div>
 
       <div className="discover-stage">
         {spinning ? (
@@ -64,7 +98,7 @@ export default function Discovery() {
                 {t('atlasOpenLocation')} →
               </Link>
               <button className="btn secondary" onClick={discover}>
-                🎲 {t('discoverAgain')}
+                🔭 {t('discoverAgain')}
               </button>
             </div>
             {wasNew && <p className="feature-sub" style={{ marginTop: 8 }}>✨ {t('discoverNew')}</p>}
@@ -73,7 +107,7 @@ export default function Discovery() {
           <>
             <div className="discover-globe-emoji">🌍</div>
             <button className="btn" style={{ fontSize: 18, padding: '14px 34px' }} onClick={discover}>
-              🎲 {t('discoverButton')}
+              🔭 {t('discoverButton')}
             </button>
           </>
         )}

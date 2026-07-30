@@ -9,6 +9,7 @@ import { LOCATION_TEACHINGS, PERSON_TEACHINGS } from '../../data/teachings';
 import { illustrationCandidates } from '../../data/illustrations';
 import { formatYear } from '../../data/types';
 import { useProgress } from '../../state/store';
+import { useSettings } from '../../state/settingsStore';
 import ReflectionCard from './ReflectionCard';
 
 export default function LocationPage() {
@@ -18,6 +19,7 @@ export default function LocationPage() {
   const visitLocation = useProgress((s) => s.visitLocation);
   const markRead = useProgress((s) => s.markRead);
   const isRead = useProgress((s) => Boolean(id && s.read[id]));
+  const younger = useSettings((s) => s.youngerExplorer);
   const [expandedPerson, setExpandedPerson] = useState<string | null>(null);
   const [imgIdx, setImgIdx] = useState(0);
 
@@ -111,7 +113,7 @@ export default function LocationPage() {
 
         <div className="section story">
           <h2>{t('locWhyItMatters')}</h2>
-          {L(loc.whyItMatters).map((p, i) => (
+          {(younger ? L(loc.whyItMatters).slice(0, 1) : L(loc.whyItMatters)).map((p, i) => (
             <p key={i}>{p}</p>
           ))}
         </div>

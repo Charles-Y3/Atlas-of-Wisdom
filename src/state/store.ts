@@ -53,9 +53,9 @@ interface AtlasProgress {
   openDailyTeaching: () => void;
   exploreLegend: (id: string) => void;
   answerQuiz: (correct: boolean) => void;
-  /** Award quest-step XP if the location's story is already read. */
+  /** Award quest-step XP when the explorer confirms the place by name. */
   completeQuestStep: (questId: string, locationId: string) => void;
-  /** Sync any already-read quest steps that were never awarded (e.g. after upgrade). */
+  /** Legacy no-op — quests are confirmed by guess, not by visit. */
   syncQuestProgress: () => void;
   reset: () => void;
 }
@@ -219,8 +219,8 @@ export const useProgress = create<AtlasProgress>()(
       }
 
       /**
-       * If `locationId` is a quest step and newly found (visited), award XP.
-       * When every step is found, award questComplete once.
+       * Award a quest step only when the explorer explicitly confirms the
+       * place (guess form on Quests) — visiting a pin alone never ticks it.
        */
       function awardQuestStep(
         next: Snapshot,
@@ -230,8 +230,6 @@ export const useProgress = create<AtlasProgress>()(
       ): boolean {
         const quest = QUESTS.find((q) => q.id === questId);
         if (!quest || !quest.steps.some((s) => s.id === locationId)) return false;
-        // Found = visited the place via the Atlas (hint hunt), not a deep link.
-        if (!next.visited[locationId]) return false;
         const prog = next.questProgress[questId] ?? { completedSteps: [] };
         if (prog.completedSteps.includes(locationId)) return false;
 
@@ -260,25 +258,6 @@ export const useProgress = create<AtlasProgress>()(
         return true;
       }
 
-      /** Scan quests for a newly-visited location (or every visited location). */
-      function collectQuestProgress(
-        next: Snapshot,
-        locationId?: string,
-        opts?: { silent?: boolean },
-      ): void {
-        for (const q of QUESTS) {
-          const stepIds = q.steps.map((s) => s.id);
-          const candidates = locationId
-            ? stepIds.includes(locationId)
-              ? [locationId]
-              : []
-            : stepIds;
-          for (const step of candidates) {
-            awardQuestStep(next, q.id, step, opts);
-          }
-        }
-      }
-
       return {
         ...emptyState(),
 
@@ -291,7 +270,6 @@ export const useProgress = create<AtlasProgress>()(
             next.xp = gainXp(XP_FOR.firstVisit, next);
             toast({ titleKey: 'locFirstVisitXp', emoji: '📍', xp: XP_FOR.firstVisit });
           }
-          collectQuestProgress(next, id);
           collectUnlocks(next);
           set({ ...next, lastLocationId: id });
         },
@@ -384,21 +362,16 @@ export const useProgress = create<AtlasProgress>()(
           const s = get();
           const next = snapshot(s);
           if (!awardQuestStep(next, questId, locationId)) return;
+          // Naming a place also counts as arriving there.
+          if (!next.visited[locationId] && LOCATION_BY_ID[locationId]) {
+            next.visited = { ...next.visited, [locationId]: new Date().toISOString() };
+          }
           collectUnlocks(next);
-          set(next);
+          set({ ...next, lastLocationId: locationId });
         },
 
-        syncQuestProgress: () => {
-          const s = get();
-          const next = snapshot(s);
-          const beforeXp = next.xp;
-          const beforeDone = next.completedQuests.length;
-          // Silent: avoid toast spam when backfilling already-read stops.
-          collectQuestProgress(next, undefined, { silent: true });
-          if (next.xp === beforeXp && next.completedQuests.length === beforeDone) return;
-          collectUnlocks(next);
-          set(next);
-        },
+        /** No-op kept for older callers — quests no longer auto-fill from visits. */
+        syncQuestProgress: () => {},
 
         reset: () => set({ ...emptyState() }),
       };

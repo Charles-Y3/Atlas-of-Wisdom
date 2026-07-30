@@ -43,3 +43,28 @@ export function yesterdayKey(d = new Date()): string {
   y.setDate(y.getDate() - 1);
   return todayKey(y);
 }
+
+/** Local year-month key, e.g. "2026-07". */
+export function monthKey(d = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  return `${y}-${m}`;
+}
+
+export interface OnThisDayEvent {
+  locId: string;
+  year: number;
+  eventIndex: number;
+}
+
+/**
+ * Flatten every location timeline into a corpus, then pick one entry by
+ * local date. Years only — not literal calendar anniversaries.
+ */
+export function onThisDayPick(
+  events: OnThisDayEvent[],
+  day = todayKey(),
+): OnThisDayEvent | null {
+  if (events.length === 0) return null;
+  return events[pickIndex(`onThisDay:${day}`, events.length)] ?? null;
+}
