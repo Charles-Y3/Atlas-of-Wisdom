@@ -26,12 +26,13 @@ export default function Atlas() {
   const quest = questId ? QUEST_BY_ID[questId] : undefined;
 
   const visitedIds = useMemo(() => new Set(Object.keys(visited)), [visited]);
+  /** Clue answers only — sealed visits never add a trail stop. */
   const foundSteps = useMemo(
     () => new Set(quest ? progress.questProgress?.[quest.id]?.completedSteps ?? [] : []),
     [quest, progress.questProgress],
   );
 
-  /** Only confirmed stops — never reveal unfound places on the map. */
+  /** Trail from correctly named clues only (≥2). Visited pins are ignored. */
   const questTrail = useMemo((): QuestTrailStop[] | null => {
     if (!quest || legendsMode) return null;
     const stops = quest.steps

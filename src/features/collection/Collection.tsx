@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useT } from '../../i18n/useT';
 import { COLLECTIONS } from '../../data/collections';
@@ -6,33 +6,88 @@ import { LOCATIONS } from '../../data/locations';
 import { CATEGORY_BY_ID } from '../../data/categories';
 import { LEGENDS } from '../../data/legends';
 import { LEGEND_COLLECTION, isLegendCollectionComplete } from '../../data/legendCollection';
-import { useProgress } from '../../state/store';
+import { illustrationCandidates } from '../../data/illustrations';
+import { livedPlaceIds, useProgress } from '../../state/store';
 import type { CollectionDef } from '../../data/types';
+import type { UiKey } from '../../i18n/strings';
+import ScrollHintRow from '../../components/ScrollHintRow';
 
-type Tab = CollectionDef['kind'] | 'legends';
+type Tab = CollectionDef['kind'] | 'legends' | 'gallery';
 
-const TABS: { kind: Tab; labelKey: 'collectionTabPlaces' | 'collectionTabVirtues' | 'atlasLegends'; emoji: string }[] = [
+const TABS: { kind: Tab; labelKey: UiKey; emoji: string }[] = [
   { kind: 'places', labelKey: 'collectionTabPlaces', emoji: '🗺️' },
   { kind: 'virtues', labelKey: 'collectionTabVirtues', emoji: '🧭' },
+  { kind: 'gallery', labelKey: 'collectionTabGallery', emoji: '🖼️' },
   { kind: 'legends', labelKey: 'atlasLegends', emoji: '📜' },
 ];
+
+function PlateThumb({
+  locationId,
+  illustration,
+  emoji,
+  name,
+}: {
+  locationId: string;
+  illustration?: string;
+  emoji: string;
+  name: string;
+}) {
+  const [srcIdx, setSrcIdx] = useState(0);
+  const [failed, setFailed] = useState(false);
+  const srcs = illustrationCandidates(locationId, illustration);
+  const src = !failed ? srcs[srcIdx] : undefined;
+
+  return (
+    <Link to={`/location/${locationId}`} className="plate-card" title={name}>
+      {src ? (
+        <img
+          className="plate-card-img"
+          src={src}
+          alt=""
+          onError={() => {
+            if (srcIdx + 1 < srcs.length) setSrcIdx((i) => i + 1);
+            else setFailed(true);
+          }}
+        />
+      ) : (
+        <div className="plate-card-fallback" aria-hidden>
+          {emoji}
+        </div>
+      )}
+      <span className="plate-card-name">
+        {emoji} {name}
+      </span>
+    </Link>
+  );
+}
 
 export default function Collection() {
   const { t, L } = useT();
   const visited = useProgress((s) => s.visited);
-  const read = useProgress((s) => s.read);
+  const reflections = useProgress((s) => s.reflections);
+  const practices = useProgress((s) => s.practices);
   const exploredLegends = useProgress((s) => s.exploredLegends);
   const visitedIds = new Set(Object.keys(visited));
-  const readIds = new Set(Object.keys(read));
+  const livedIds = livedPlaceIds(reflections, practices);
   const exploredIds = new Set(Object.keys(exploredLegends ?? {}));
   const [tab, setTab] = useState<Tab>('places');
+
+  const sealedPlates = useMemo(
+    () =>
+      LOCATIONS.filter((l) => visited[l.id]).sort((a, b) =>
+        L(a.name).localeCompare(L(b.name)),
+      ),
+    [visited, L],
+  );
 
   const subtitle =
     tab === 'virtues'
       ? t('collectionSubtitleVirtues')
       : tab === 'legends'
         ? L(LEGEND_COLLECTION.description)
-        : t('collectionSubtitle');
+        : tab === 'gallery'
+          ? t('collectionSubtitleGallery')
+          : t('collectionSubtitle');
 
   const legendsGot = LEGENDS.filter((m) => exploredIds.has(m.id));
   const legendsComplete = isLegendCollectionComplete(exploredIds);
@@ -42,20 +97,39 @@ export default function Collection() {
       <h1 className="page-title">🗃️ {t('collectionTitle')}</h1>
       <p className="page-subtitle">{subtitle}</p>
 
-      <div className="chip-row" style={{ marginBottom: 4 }}>
-        {TABS.map((tabDef) => (
-          <button
-            key={tabDef.kind}
-            className={`chip ${tab === tabDef.kind ? 'active' : ''}`}
-            onClick={() => setTab(tabDef.kind)}
-          >
-            {tabDef.emoji} {t(tabDef.labelKey)}
-          </button>
-        ))}
+      <div style={{ marginBottom: 4 }}>
+        <ScrollHintRow>
+          {TABS.map((tabDef) => (
+            <button
+              key={tabDef.kind}
+              type="button"
+              className={`chip ${tab === tabDef.kind ? 'active' : ''}`}
+              onClick={() => setTab(tabDef.kind)}
+            >
+              {tabDef.emoji} {t(tabDef.labelKey)}
+            </button>
+          ))}
+        </ScrollHintRow>
       </div>
 
       <div className="coll-list">
-        {tab === 'legends' ? (
+        {tab === 'gallery' ? (
+          sealedPlates.length === 0 ? (
+            <p className="page-subtitle">{t('collectionGalleryEmpty')}</p>
+          ) : (
+            <div className="plate-gallery">
+              {sealedPlates.map((loc) => (
+                <PlateThumb
+                  key={loc.id}
+                  locationId={loc.id}
+                  illustration={loc.illustration}
+                  emoji={CATEGORY_BY_ID[loc.category].emoji}
+                  name={L(loc.name)}
+                />
+              ))}
+            </div>
+          )
+        ) : tab === 'legends' ? (
           <div key={LEGEND_COLLECTION.id} className="card">
             <div className="coll-head">
               <span className="coll-emoji">{LEGEND_COLLECTION.emoji}</span>
@@ -107,7 +181,7 @@ export default function Collection() {
           COLLECTIONS.filter((c) => c.kind === tab).map((c) => {
             const members = LOCATIONS.filter(c.match);
             if (members.length === 0) return null;
-            const earned = c.kind === 'virtues' ? readIds : visitedIds;
+            const earned = c.kind === 'virtues' ? livedIds : visitedIds;
             const got = members.filter((m) => earned.has(m.id));
             const complete = got.length === members.length;
             return (

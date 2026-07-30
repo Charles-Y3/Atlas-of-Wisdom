@@ -211,8 +211,8 @@ export const UI = {
   // ── Quests ─────────────────────────────────────────────────────────
   questsTitle: localized('Quests', '旅程'),
   questsSubtitle: localized(
-    'Read each clue, then name the place — filter by country if it helps. Visiting a pin alone does not count.',
-    '读懂每条线索，再点出地名——可按国家筛选。仅打开地图标记不算找到。',
+    'Read each clue, then name the place — filter by country if it helps. Visiting a pin alone does not count. Trails appear only after you answer clues correctly.',
+    '读懂每条线索，再点出地名——可按国家筛选。仅到访地点不算找到。路线只在答对线索后才会出现。',
   ),
   questProgress: localized('found', '已找到'),
   questComplete: localized('A pilgrimage complete', '一段朝圣之路完成了'),
@@ -233,6 +233,14 @@ export const UI = {
   questNudge: localized('{n} clues left to find', '还剩 {n} 条线索待寻'),
   questShowTrail: localized('Show trail on Atlas', '在地图上显示路线'),
   questTrailPreview: localized('Trail', '路线'),
+  questTrailHint: localized(
+    'The trail links only places you named correctly for this quest — sealing a visit elsewhere does not add a stop.',
+    '路线只连接你在此旅程中答对的地点 — 在别处盖印到访不会加入路线。',
+  ),
+  questTrailLocked: localized(
+    'Answer two clues correctly to unlock the trail. Visiting places does not count.',
+    '答对两条线索后解锁路线。仅到访地点不算。',
+  ),
   questKindPilgrimage: localized('Pilgrimage', '朝圣'),
   questKindLearning: localized('Learning', '求学'),
   questKindMountain: localized('Mountains', '山岳'),
@@ -243,14 +251,23 @@ export const UI = {
   collectionTitle: localized('Collections', '收藏'),
   collectionSubtitle: localized('Every place you explore joins your atlas.', '你探索过的每个地方，都会收入你的地图集。'),
   collectionSubtitleVirtues: localized(
-    'Virtue collections grow when you read a place’s story — not just visit the pin.',
-    '德行收藏在你读完一处故事后增长——不只是点开地图上的标记。',
+    'Virtue collections grow when you reflect or accept a practice — not just seal a visit.',
+    '德行收藏在你写下反思或接受练习后增长——不只是盖印到访。',
+  ),
+  collectionSubtitleGallery: localized(
+    'Parchment plates for every place you have sealed.',
+    '你已盖印的每一处地点的羊皮纸插画。',
+  ),
+  collectionGalleryEmpty: localized(
+    'Seal a place with its place check to collect its plate here.',
+    '通过地点测验盖印后，插画会出现在这里。',
   ),
   collectionComplete: localized('Complete!', '已集齐！'),
   collectionProgress: localized('collected', '已收集'),
   collectionLocked: localized('Keep exploring to reveal this collection.', '继续探索以揭开这个收藏。'),
   collectionTabPlaces: localized('Places', '地点'),
   collectionTabVirtues: localized('Virtues', '德行'),
+  collectionTabGallery: localized('Plates', '插画'),
   collectionNudge: localized('{n} more to complete', '还差 {n} 处即可集齐'),
 
   // ── Profile / progression ──────────────────────────────────────────

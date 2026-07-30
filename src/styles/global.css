@@ -1280,6 +1280,58 @@ button {
 }
 .member-dot.on { background: var(--gold); border-color: var(--gold-deep); }
 
+.plate-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+.plate-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-decoration: none;
+  color: inherit;
+  background: var(--paper-deep);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 8px;
+  transition: border-color 0.15s ease;
+}
+.plate-card:hover { border-color: var(--gold); }
+.plate-card-img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+  background: #e8dcc4;
+}
+.plate-card-fallback {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  background: #efe4cc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+}
+.plate-card-name {
+  font-size: 13px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.quest-trail-hint {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
 /* ── Profile ───────────────────────────────────────────────────────── */
 
 .rank-card { text-align: center; padding: 22px 16px; }
