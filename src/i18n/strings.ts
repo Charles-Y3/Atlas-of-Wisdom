@@ -145,6 +145,13 @@ export const UI = {
   locLearnMore: localized('Learn more on Wikipedia', '在维基百科了解更多'),
   locShowOnMap: localized('Show on map', '在地图上查看'),
   locFirstVisitXp: localized('New discovery!', '新发现！'),
+  locSealXp: localized('Place sealed!', '地点已盖印！'),
+  locSealTitle: localized('Seal this place', '为此地盖印'),
+  locSealIntro: localized(
+    'Answer two short questions to mark this place as visited. Wrong answers do not advance — try again.',
+    '答对两道简短题，即可将此地记为已到访。答错不会前进 — 再试一次。',
+  ),
+  locSealDone: localized('Place sealed', '地点已盖印'),
   locReadBonus: localized('Read to the end — bonus XP', '读完全部 — 奖励经验'),
   locMarkRead: localized('I have finished reading', '我已读完'),
   locReadDone: localized('Story complete', '故事已读完'),
@@ -153,8 +160,8 @@ export const UI = {
   locVirtues: localized('What this place teaches', '此地予人的启示'),
   reflectTitle: localized('Take a moment', '停一停'),
   reflectIntro: localized(
-    'You have read the story. Now one question — there is no right answer, and only you will see it.',
-    '故事你已读完。现在一个问题 — 没有标准答案，也只有你自己会看到。',
+    'You have read the story. Now one question — there is no right answer, and only you will see it. Saving ticks this place on your Virtue Compass.',
+    '故事你已读完。现在一个问题 — 没有标准答案，也只有你自己会看到。保存后会在德行罗盘上记下此地。',
   ),
   reflectPlaceholder: localized('Write a few honest lines…', '诚实地写下几行…'),
   reflectSave: localized('Save reflection', '保存反思'),
@@ -164,14 +171,24 @@ export const UI = {
   reflectYours: localized('You wrote', '你写下的'),
   reflectSkip: localized('Maybe later', '稍后再说'),
 
+  practiceTitle: localized('A small practice', '一点小小的练习'),
+  practiceIntro: localized(
+    'Optional. Accept a tiny practice for this place — it also counts on your Virtue Compass.',
+    '可选。接受此地的一点小练习 — 同样会记入你的德行罗盘。',
+  ),
+  practiceAccept: localized('I will try this', '我愿意试试'),
+  practiceDone: localized('Practice noted', '练习已记下'),
+  practiceYours: localized('Your practice', '你的练习'),
+  practiceSaved: localized('Practice noted', '练习已记下'),
+
   compassTitle: localized('Virtue Compass', '德行罗盘'),
   compassIntro: localized(
-    'The shape of the stories you have read so far.',
-    '你至今所读过的故事的形状。',
+    'The shape of places you have reflected on — or practised with.',
+    '你曾反思或践行过的地方所呈现的形状。',
   ),
   compassEmpty: localized(
-    'Read a few stories and your compass will take shape.',
-    '读完几个故事，你的罗盘就会显出形状。',
+    'Write a reflection or accept a practice, and your compass will take shape.',
+    '写下反思或接受练习，你的罗盘就会显出形状。',
   ),
   compassPlacesCount: localized('places', '处'),
 

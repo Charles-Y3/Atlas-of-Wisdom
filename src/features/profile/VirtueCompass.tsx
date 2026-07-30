@@ -9,15 +9,16 @@ const CY = SIZE / 2;
 const R = 88;
 
 /**
- * Radar chart of which virtues the explorer's read stories embody.
+ * Radar chart of virtues from lived places (reflection and/or practice).
  * Each axis is scaled against how many places in the whole atlas carry
- * that virtue, so a full ring means "you have read every place of this
+ * that virtue, so a full ring means "you have lived every place of this
  * kind" rather than an arbitrary number.
  */
 export default function VirtueCompass() {
   const { t, L } = useT();
-  const read = useProgress((s) => s.read);
-  const counts = virtueCounts(read);
+  const reflections = useProgress((s) => s.reflections);
+  const practices = useProgress((s) => s.practices);
+  const counts = virtueCounts(reflections, practices);
 
   const axes = VIRTUES.map((v, i) => {
     const total = LOCATIONS.filter((l) => l.virtues.includes(v.id)).length;

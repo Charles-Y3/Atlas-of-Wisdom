@@ -1,7 +1,7 @@
 import { LOCATION_BY_ID } from '../../data/locations';
 import type { QuestStep } from '../../data/quests';
 
-/** Compact SVG trail of quest stops — unfound stops unnamed. */
+/** Compact SVG of confirmed quest stops only — appears once two are linked. */
 export default function QuestTrailPreview({
   steps,
   foundIds,
@@ -10,9 +10,12 @@ export default function QuestTrailPreview({
   foundIds: Set<string>;
 }) {
   const pts = steps
-    .map((s) => {
+    .map((s, i) => {
+      if (!foundIds.has(s.id)) return null;
       const loc = LOCATION_BY_ID[s.id];
-      return loc ? { id: s.id, lon: loc.coords[0], lat: loc.coords[1], found: foundIds.has(s.id) } : null;
+      return loc
+        ? { id: s.id, lon: loc.coords[0], lat: loc.coords[1], index: i + 1 }
+        : null;
     })
     .filter((p): p is NonNullable<typeof p> => Boolean(p));
 
@@ -48,28 +51,20 @@ export default function QuestTrailPreview({
         strokeDasharray="4 4"
         strokeLinejoin="round"
       />
-      {pts.map((p, i) => {
+      {pts.map((p) => {
         const [x, y] = xy(p.lon, p.lat);
         return (
           <g key={p.id}>
-            <circle
-              cx={x}
-              cy={y}
-              r={p.found ? 6 : 5}
-              fill={p.found ? '#b08a3c' : '#e8dcc4'}
-              stroke={p.found ? '#6b4f2a' : '#8a7a60'}
-              strokeWidth="1.5"
-              opacity={p.found ? 1 : 0.55}
-            />
+            <circle cx={x} cy={y} r={6} fill="#b08a3c" stroke="#6b4f2a" strokeWidth="1.5" />
             <text
               x={x}
               y={y + 1}
               textAnchor="middle"
               dominantBaseline="central"
               fontSize="8"
-              fill={p.found ? '#fffdf6' : '#5c4a32'}
+              fill="#fffdf6"
             >
-              {i + 1}
+              {p.index}
             </text>
           </g>
         );

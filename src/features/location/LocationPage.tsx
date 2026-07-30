@@ -11,13 +11,16 @@ import { formatYear } from '../../data/types';
 import { useProgress } from '../../state/store';
 import { useSettings } from '../../state/settingsStore';
 import ReflectionCard from './ReflectionCard';
+import PlaceSeal from './PlaceSeal';
+import PracticeChip from './PracticeChip';
 
 export default function LocationPage() {
   const { id } = useParams<{ id: string }>();
   const { t, L, locale } = useT();
   const navigate = useNavigate();
-  const visitLocation = useProgress((s) => s.visitLocation);
+  const openLocation = useProgress((s) => s.openLocation);
   const markRead = useProgress((s) => s.markRead);
+  const isSealed = useProgress((s) => Boolean(id && s.visited[id]));
   const isRead = useProgress((s) => Boolean(id && s.read[id]));
   const younger = useSettings((s) => s.youngerExplorer);
   const [expandedPerson, setExpandedPerson] = useState<string | null>(null);
@@ -29,8 +32,8 @@ export default function LocationPage() {
   const imgSrc = imgSrcs[imgIdx];
 
   useEffect(() => {
-    if (loc) visitLocation(loc.id);
-  }, [loc, visitLocation]);
+    if (loc) openLocation(loc.id);
+  }, [loc, openLocation]);
 
   useEffect(() => {
     setImgIdx(0);
@@ -217,16 +220,29 @@ export default function LocationPage() {
           </div>
         )}
 
+        {!isSealed && <PlaceSeal location={loc} />}
+
+        {isSealed && (
+          <div className="section" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {isRead ? (
+              <span className="tag visited" style={{ alignSelf: 'flex-start' }}>
+                ✓ {t('locReadDone')}
+              </span>
+            ) : (
+              <button type="button" className="btn" onClick={() => markRead(loc.id)}>
+                📖 {t('locMarkRead')}
+              </button>
+            )}
+            <span className="tag gold" style={{ alignSelf: 'flex-start' }}>
+              ✓ {t('locSealDone')}
+            </span>
+          </div>
+        )}
+
         {isRead && <ReflectionCard location={loc} />}
+        {isRead && <PracticeChip location={loc} />}
 
         <div className="section" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {isRead ? (
-            <span className="tag visited" style={{ alignSelf: 'flex-start' }}>✓ {t('locReadDone')}</span>
-          ) : (
-            <button className="btn" onClick={() => markRead(loc.id)}>
-              📖 {t('locMarkRead')}
-            </button>
-          )}
           <Link className="btn secondary" to={`/atlas?focus=${loc.id}`}>
             🗺️ {t('locShowOnMap')}
           </Link>

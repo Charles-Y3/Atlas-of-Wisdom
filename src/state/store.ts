@@ -20,14 +20,24 @@ export interface Reflection {
   day: string;
 }
 
+/** Optional practice accepted for a place (also ticks its virtues). */
+export interface VirtuePractice {
+  virtue: VirtueId;
+  day: string;
+}
+
 interface AtlasProgress {
   xp: number;
-  /** locationId → ISO date of first visit. */
+  /** locationId → ISO date of first page open (seen, not sealed). */
+  opened: Record<string, string>;
+  /** locationId → ISO date of place seal (quiz / quest / daily quiz). */
   visited: Record<string, string>;
   /** locationId → true once the full story was read. */
   read: Record<string, true>;
   /** locationId → the reflection written after reading it. */
   reflections: Record<string, Reflection>;
+  /** locationId → optional virtue practice chip. */
+  practices: Record<string, VirtuePractice>;
   achievements: string[];
   completedCollections: string[];
   discoveriesMade: number;
@@ -45,14 +55,18 @@ interface AtlasProgress {
   streak: { count: number; lastDay: string | null };
   lastLocationId: string | null;
 
+  /** Soft open — no place-collection credit. */
+  openLocation: (id: string) => void;
+  /** Seal a place after place-check / daily quiz / quest confirm. */
   visitLocation: (id: string) => void;
   markRead: (id: string) => void;
   submitReflection: (id: string, virtue: VirtueId, text: string) => void;
+  acceptPractice: (id: string, virtue: VirtueId) => void;
   recordDiscovery: (id: string) => void;
   openDailyDiscovery: (id: string) => void;
   openDailyTeaching: () => void;
   exploreLegend: (id: string) => void;
-  answerQuiz: (correct: boolean) => void;
+  answerQuiz: (correct: boolean, locationId?: string) => void;
   /** Award quest-step XP when the explorer confirms the place by name. */
   completeQuestStep: (questId: string, locationId: string) => void;
   /** Legacy no-op — quests are confirmed by guess, not by visit. */
@@ -63,9 +77,11 @@ interface AtlasProgress {
 function emptyState() {
   return {
     xp: 0,
+    opened: {},
     visited: {},
     read: {},
     reflections: {},
+    practices: {},
     achievements: [],
     completedCollections: [],
     discoveriesMade: 0,
@@ -81,12 +97,21 @@ function emptyState() {
   };
 }
 
+/** Places whose virtues count on the compass / virtue collections. */
+export function livedPlaceIds(
+  reflections: Record<string, Reflection> | undefined,
+  practices: Record<string, VirtuePractice> | undefined,
+): Set<string> {
+  return new Set([...Object.keys(reflections ?? {}), ...Object.keys(practices ?? {})]);
+}
+
 export function statsOf(
   s: Pick<
     AtlasProgress,
     | 'visited'
     | 'read'
     | 'reflections'
+    | 'practices'
     | 'completedCollections'
     | 'streak'
     | 'discoveriesMade'
@@ -97,8 +122,10 @@ export function statsOf(
   const visitedIds = Object.keys(s.visited);
   const readIds = Object.keys(s.read);
   const continents = new Set(visitedIds.map((id) => LOCATION_BY_ID[id]?.continent).filter(Boolean));
-  // Virtues are earned by reading stories, not by pin-collecting.
-  const virtues = new Set(readIds.flatMap((id) => LOCATION_BY_ID[id]?.virtues ?? []));
+  const lived = livedPlaceIds(s.reflections, s.practices);
+  const virtues = new Set(
+    [...lived].flatMap((id) => LOCATION_BY_ID[id]?.virtues ?? []),
+  );
   return {
     placesExplored: visitedIds.length,
     storiesRead: readIds.length,
@@ -114,12 +141,15 @@ export function statsOf(
 }
 
 /**
- * How many places whose stories the explorer has read carry each virtue —
+ * How many lived places (reflection and/or practice) carry each virtue —
  * the data behind the Virtue Compass.
  */
-export function virtueCounts(read: Record<string, true>): Record<string, number> {
+export function virtueCounts(
+  reflections: Record<string, Reflection> | undefined,
+  practices?: Record<string, VirtuePractice>,
+): Record<string, number> {
   const counts: Record<string, number> = {};
-  for (const id of Object.keys(read)) {
+  for (const id of livedPlaceIds(reflections, practices)) {
     for (const v of LOCATION_BY_ID[id]?.virtues ?? []) counts[v] = (counts[v] ?? 0) + 1;
   }
   return counts;
@@ -159,9 +189,11 @@ export const useProgress = create<AtlasProgress>()(
       type Snapshot = Pick<
         AtlasProgress,
         | 'xp'
+        | 'opened'
         | 'visited'
         | 'read'
         | 'reflections'
+        | 'practices'
         | 'completedCollections'
         | 'achievements'
         | 'streak'
@@ -177,9 +209,11 @@ export const useProgress = create<AtlasProgress>()(
         const streak = touchedStreak(s.streak);
         const next: Snapshot = {
           xp: s.xp,
+          opened: s.opened ?? {},
           visited: s.visited,
           read: s.read,
           reflections: s.reflections ?? {},
+          practices: s.practices ?? {},
           completedCollections: s.completedCollections,
           achievements: s.achievements,
           streak,
@@ -206,12 +240,12 @@ export const useProgress = create<AtlasProgress>()(
        */
       function collectUnlocks(next: Snapshot): void {
         const visitedIds = new Set(Object.keys(next.visited));
-        const readIds = new Set(Object.keys(next.read));
+        const livedIds = livedPlaceIds(next.reflections, next.practices);
         for (const c of COLLECTIONS) {
           if (next.completedCollections.includes(c.id)) continue;
           const members = LOCATIONS.filter(c.match);
-          // Place collections: visit. Virtue collections: mark story as read.
-          const earned = c.kind === 'virtues' ? readIds : visitedIds;
+          // Place collections: sealed visit. Virtue collections: lived (reflect/practice).
+          const earned = c.kind === 'virtues' ? livedIds : visitedIds;
           if (members.length > 0 && members.every((m) => earned.has(m.id))) {
             next.completedCollections = [...next.completedCollections, c.id];
             next.xp = gainXp(XP_FOR.collection, next);
@@ -227,6 +261,19 @@ export const useProgress = create<AtlasProgress>()(
             toast({ titleKey: 'achievementUnlocked', body: a.name, emoji: a.emoji, xp: XP_FOR.achievement });
           }
         }
+      }
+
+      function sealPlace(next: Snapshot, id: string, opts?: { toast?: boolean }): boolean {
+        if (!LOCATION_BY_ID[id] || next.visited[id]) return false;
+        next.visited = { ...next.visited, [id]: new Date().toISOString() };
+        if (!next.opened[id]) {
+          next.opened = { ...next.opened, [id]: next.visited[id] };
+        }
+        next.xp = gainXp(XP_FOR.firstVisit, next);
+        if (opts?.toast !== false) {
+          toast({ titleKey: 'locSealXp', emoji: '📍', xp: XP_FOR.firstVisit });
+        }
+        return true;
       }
 
       /**
@@ -272,15 +319,22 @@ export const useProgress = create<AtlasProgress>()(
       return {
         ...emptyState(),
 
+        openLocation: (id) => {
+          const s = get();
+          if (!LOCATION_BY_ID[id]) return;
+          const next = snapshot(s);
+          if (!next.opened[id]) {
+            next.opened = { ...next.opened, [id]: new Date().toISOString() };
+          }
+          // Opening alone never seals or completes place collections.
+          set({ ...next, lastLocationId: id });
+        },
+
         visitLocation: (id) => {
           const s = get();
           if (!LOCATION_BY_ID[id]) return;
           const next = snapshot(s);
-          if (!s.visited[id]) {
-            next.visited = { ...s.visited, [id]: new Date().toISOString() };
-            next.xp = gainXp(XP_FOR.firstVisit, next);
-            toast({ titleKey: 'locFirstVisitXp', emoji: '📍', xp: XP_FOR.firstVisit });
-          }
+          sealPlace(next, id);
           collectUnlocks(next);
           set({ ...next, lastLocationId: id });
         },
@@ -288,6 +342,8 @@ export const useProgress = create<AtlasProgress>()(
         markRead: (id) => {
           const s = get();
           if (s.read[id] || !LOCATION_BY_ID[id]) return;
+          // Story completion follows a sealed place.
+          if (!s.visited[id]) return;
           const next = snapshot(s);
           next.read = { ...s.read, [id]: true as const };
           next.xp = gainXp(XP_FOR.readStory, next);
@@ -302,10 +358,23 @@ export const useProgress = create<AtlasProgress>()(
           // Mirrors Journey's minimum-effort thresholds: a reflection has
           // to be an actual thought, not a keystroke.
           if (trimmed.length < MIN_REFLECTION_CHARS || !LOCATION_BY_ID[id]) return;
+          if (!s.read[id]) return;
           const next = snapshot(s);
           next.reflections = { ...next.reflections, [id]: { virtue, text: trimmed, day: todayKey() } };
           next.xp = gainXp(XP_FOR.reflection, next);
           toast({ titleKey: 'reflectionSaved', emoji: '🪞', xp: XP_FOR.reflection });
+          collectUnlocks(next);
+          set(next);
+        },
+
+        acceptPractice: (id, virtue) => {
+          const s = get();
+          if (!LOCATION_BY_ID[id] || !s.read[id]) return;
+          if (s.practices?.[id]) return;
+          const next = snapshot(s);
+          next.practices = { ...next.practices, [id]: { virtue, day: todayKey() } };
+          next.xp = gainXp(XP_FOR.practice, next);
+          toast({ titleKey: 'practiceSaved', emoji: '🌱', xp: XP_FOR.practice });
           collectUnlocks(next);
           set(next);
         },
@@ -354,7 +423,7 @@ export const useProgress = create<AtlasProgress>()(
           set(next);
         },
 
-        answerQuiz: (correct) => {
+        answerQuiz: (correct, locationId) => {
           const s = get();
           const today = todayKey();
           const quiz = s.quiz?.day === today ? s.quiz : { day: today, answered: 0, correct: 0 };
@@ -365,6 +434,7 @@ export const useProgress = create<AtlasProgress>()(
           const next = snapshot(s);
           next.quizzesCompleted = s.quizzesCompleted + (finished ? 1 : 0);
           next.xp = gainXp(XP_FOR.quizQuestion, next);
+          if (locationId) sealPlace(next, locationId, { toast: true });
           collectUnlocks(next);
           set({ ...next, quiz: updated });
         },
@@ -373,10 +443,8 @@ export const useProgress = create<AtlasProgress>()(
           const s = get();
           const next = snapshot(s);
           if (!awardQuestStep(next, questId, locationId)) return;
-          // Naming a place also counts as arriving there.
-          if (!next.visited[locationId] && LOCATION_BY_ID[locationId]) {
-            next.visited = { ...next.visited, [locationId]: new Date().toISOString() };
-          }
+          // Naming a place also seals arrival.
+          sealPlace(next, locationId, { toast: false });
           collectUnlocks(next);
           set({ ...next, lastLocationId: locationId });
         },
@@ -387,7 +455,23 @@ export const useProgress = create<AtlasProgress>()(
         reset: () => set({ ...emptyState() }),
       };
     },
-    { name: 'atlas-progress', version: 2 },
+    {
+      name: 'atlas-progress',
+      version: 3,
+      migrate: (persisted, version) => {
+        const p = (persisted ?? {}) as Record<string, unknown>;
+        if (version < 3) {
+          const visited = (p.visited as Record<string, string>) ?? {};
+          // Legacy visits count as sealed; seed opened from the same set.
+          return {
+            ...p,
+            opened: (p.opened as Record<string, string>) ?? { ...visited },
+            practices: (p.practices as Record<string, VirtuePractice>) ?? {},
+          };
+        }
+        return p;
+      },
+    },
   ),
 );
 

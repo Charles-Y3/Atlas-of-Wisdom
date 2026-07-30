@@ -2,12 +2,13 @@ import { localized, type Localized } from '../i18n/types';
 
 // ── XP rewards ─────────────────────────────────────────────────────────
 export const XP_FOR = {
-  firstVisit: 15,       // opening a location's page for the first time
+  firstVisit: 25,       // sealing a place by passing its place check
   readStory: 55,        // finishing the story (and teaching) of a location
   discovery: 15,        // using Discovery mode on a new place
   dailyDiscovery: 20,   // opening the Discovery of the Day
   quizQuestion: 10,     // each daily-quiz question answered correctly
   reflection: 70,       // writing a reflection on a place's virtue
+  practice: 35,         // accepting an optional virtue practice chip
   collection: 150,      // completing a collection
   achievement: 60,      // unlocking an achievement
   teachingOfDay: 15,    // opening Teaching of the Day once per day

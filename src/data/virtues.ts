@@ -28,6 +28,9 @@ export interface Virtue {
   reflection: Localized<string>;
   /** Simpler prompt when Younger explorer mode is on. */
   reflectionYoung: Localized<string>;
+  /** Optional tiny practice that also ticks this virtue for a place. */
+  practice: Localized<string>;
+  practiceYoung: Localized<string>;
 }
 
 export const VIRTUES: Virtue[] = [
@@ -47,6 +50,14 @@ export const VIRTUES: Virtue[] = [
       'What is something new you learned this week?',
       '这一周你学到了什么新东西？',
     ),
+    practice: localized(
+      'Ask one honest question today — and really listen to the answer.',
+      '今天提出一个诚实的问题 — 并认真倾听回答。',
+    ),
+    practiceYoung: localized(
+      'Learn one new fact and tell someone about it.',
+      '学一个新知识，讲给别人听。',
+    ),
   },
   {
     id: 'compassion',
@@ -63,6 +74,14 @@ export const VIRTUES: Virtue[] = [
     reflectionYoung: localized(
       'Who could you be kind to today?',
       '今天你可以对谁善良一点？',
+    ),
+    practice: localized(
+      'Do one small kindness for someone who cannot repay you.',
+      '为无法回报你的人做一件小小的善事。',
+    ),
+    practiceYoung: localized(
+      'Do one kind thing for someone today.',
+      '今天为别人做一件好事。',
     ),
   },
   {
@@ -81,6 +100,14 @@ export const VIRTUES: Virtue[] = [
       'What brave thing would you like to try?',
       '你想勇敢地试一试什么？',
     ),
+    practice: localized(
+      'Name one fear out loud, then take the smallest next step anyway.',
+      '大声说出一个恐惧，然后仍迈出最小的下一步。',
+    ),
+    practiceYoung: localized(
+      'Try something a little scary — even a tiny try counts.',
+      '试一件有点吓人的事 — 小小的尝试也算。',
+    ),
   },
   {
     id: 'humility',
@@ -97,6 +124,14 @@ export const VIRTUES: Virtue[] = [
     reflectionYoung: localized(
       'When was it okay to say “I don’t know”?',
       '什么时候说“我不知道”其实没关系？',
+    ),
+    practice: localized(
+      'Admit one thing you do not know, and ask someone who might.',
+      '承认一件你不知道的事，并向可能知道的人请教。',
+    ),
+    practiceYoung: localized(
+      'Say “I don’t know” once today — then ask for help.',
+      '今天说一次“我不知道” — 然后去请教。',
     ),
   },
   {
@@ -115,6 +150,14 @@ export const VIRTUES: Virtue[] = [
       'What do you love spending time on?',
       '你最喜欢把时间花在什么上？',
     ),
+    practice: localized(
+      'Give twenty quiet minutes to what you claim to care about most.',
+      '把二十分钟安静时间给那件你声称最在乎的事。',
+    ),
+    practiceYoung: localized(
+      'Spend ten focused minutes on something you love.',
+      '专心花十分钟在你喜爱的事上。',
+    ),
   },
   {
     id: 'perseverance',
@@ -131,6 +174,14 @@ export const VIRTUES: Virtue[] = [
     reflectionYoung: localized(
       'What are you practising that takes many tries?',
       '你在练习什么需要很多次才能做好的事？',
+    ),
+    practice: localized(
+      'Return to one unfinished task and move it forward by a single step.',
+      '回到一件未完成的事，推进一小步。',
+    ),
+    practiceYoung: localized(
+      'Practise something hard once more today.',
+      '今天再练习一次难的事情。',
     ),
   },
   {
@@ -149,6 +200,14 @@ export const VIRTUES: Virtue[] = [
       'How do you help friends get along?',
       '你怎样帮助朋友们好好相处？',
     ),
+    practice: localized(
+      'Hold two opposing views in mind without choosing a winner yet.',
+      '同时容纳两种对立看法，暂不急着分出胜负。',
+    ),
+    practiceYoung: localized(
+      'Help two people understand each other a little better.',
+      '帮助两个人彼此多理解一点。',
+    ),
   },
   {
     id: 'justice',
@@ -166,6 +225,14 @@ export const VIRTUES: Virtue[] = [
       'When have you seen something unfair, and what did you do?',
       '你见过什么不公平的事？你做了什么？',
     ),
+    practice: localized(
+      'Speak up once where silence would have been easier.',
+      '在沉默更容易的地方，勇敢发一次声。',
+    ),
+    practiceYoung: localized(
+      'If something feels unfair, say so kindly once.',
+      '若觉得不公平，温和地说一次。',
+    ),
   },
   {
     id: 'wonder',
@@ -182,6 +249,14 @@ export const VIRTUES: Virtue[] = [
     reflectionYoung: localized(
       'What made you say “wow” lately?',
       '最近什么事让你忍不住说“哇”？',
+    ),
+    practice: localized(
+      'Pause once today for something beautiful — no phone, just notice.',
+      '今天为美好停一次 — 不看手机，只是留意。',
+    ),
+    practiceYoung: localized(
+      'Find one “wow” thing outdoors or in the sky.',
+      '在户外或天空里找一件让你说“哇”的事。',
     ),
   },
 ];

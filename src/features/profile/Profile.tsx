@@ -96,8 +96,9 @@ export default function Profile() {
                   {
                     xp: progress.xp,
                     streak: progress.streak,
-                    read: progress.read,
                     visited: progress.visited,
+                    reflections: progress.reflections ?? {},
+                    practices: progress.practices ?? {},
                     completedCollections: progress.completedCollections,
                   },
                   locale,

@@ -31,20 +31,23 @@ export default function Atlas() {
     [quest, progress.questProgress],
   );
 
+  /** Only confirmed stops — never reveal unfound places on the map. */
   const questTrail = useMemo((): QuestTrailStop[] | null => {
     if (!quest || legendsMode) return null;
-    return quest.steps
+    const stops = quest.steps
       .map((s, i) => {
+        if (!foundSteps.has(s.id)) return null;
         const loc = LOCATION_BY_ID[s.id];
         if (!loc) return null;
         return {
           id: s.id,
           coords: loc.coords,
-          found: foundSteps.has(s.id),
+          found: true,
           index: i + 1,
         };
       })
       .filter((s): s is QuestTrailStop => Boolean(s));
+    return stops.length >= 2 ? stops : null;
   }, [quest, foundSteps, legendsMode]);
 
   const focusId = params.get('focus');
@@ -123,7 +126,7 @@ export default function Atlas() {
             {!unlocked && ' 🔒'}
           </button>
         </ScrollHintRow>
-        {quest && !legendsMode && (
+        {quest && !legendsMode && questTrail && (
           <div className="map-quest-banner">
             <span>
               🛤️ {t('atlasQuestTrail')}: {L(quest.name)}

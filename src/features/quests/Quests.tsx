@@ -157,13 +157,15 @@ export default function Quests() {
 
               {expanded && (
                 <div className="quest-expanded">
-                  <div className="quest-trail-block" onClick={(e) => e.stopPropagation()}>
-                    <div className="quest-trail-label">{t('questTrailPreview')}</div>
-                    <QuestTrailPreview steps={q.steps} foundIds={done} />
-                    <Link className="btn secondary quest-show-trail" to={`/atlas?quest=${q.id}`}>
-                      🗺️ {t('questShowTrail')}
-                    </Link>
-                  </div>
+                  {found >= 2 && (
+                    <div className="quest-trail-block" onClick={(e) => e.stopPropagation()}>
+                      <div className="quest-trail-label">{t('questTrailPreview')}</div>
+                      <QuestTrailPreview steps={q.steps} foundIds={done} />
+                      <Link className="btn secondary quest-show-trail" to={`/atlas?quest=${q.id}`}>
+                        🗺️ {t('questShowTrail')}
+                      </Link>
+                    </div>
+                  )}
                   <ol className="quest-steps">
                     {q.steps.map((step, i) => {
                       const foundStep = done.has(step.id);

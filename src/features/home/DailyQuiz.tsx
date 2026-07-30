@@ -55,7 +55,7 @@ export default function DailyQuiz() {
       const id = setTimeout(() => {
         // Ignore stale timers if the question index already moved.
         if (questionRef.current !== atQuestion) return;
-        answerQuiz(true);
+        answerQuiz(true, q.location.id);
         // unlock happens in the answered-effect after advance
       }, 700);
       timers.current.push(id);

@@ -632,16 +632,17 @@ button {
   z-index: 80;
   background: rgba(43, 36, 22, 0.35);
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
+  padding: 16px;
 }
 .rank-ladder-sheet {
   position: relative;
-  width: min(100%, 520px);
-  max-height: 78vh;
+  width: min(100%, 420px);
+  max-height: min(78vh, 640px);
   overflow-y: auto;
   margin: 0;
-  border-radius: 18px 18px 0 0;
+  border-radius: 18px;
 }
 .rank-ladder-list {
   list-style: none;
@@ -666,7 +667,6 @@ button {
   cursor: pointer;
 }
 .rank-ladder-row.current { border-color: var(--gold); }
-.rank-ladder-row.active { background: #f7ecd4; border-color: var(--gold); }
 .rank-ladder-row.locked { opacity: 0.55; }
 .rank-ladder-emoji { font-size: 22px; }
 .rank-ladder-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -679,19 +679,42 @@ button {
   flex-wrap: wrap;
 }
 .rank-ladder-xp { font-size: 12px; color: var(--ink-soft); }
-.rank-ladder-blurb {
-  margin-top: 12px;
-  padding: 12px;
-  background: #f4ead2;
+.rank-detail-popup {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 340px);
+  margin: 0;
+  padding: 22px 20px 18px;
+  background: var(--paper);
   border: 1px solid var(--gold);
-  border-radius: var(--radius);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(43, 36, 22, 0.28);
+  text-align: center;
 }
-.rank-ladder-blurb-title {
+.rank-detail-emoji { font-size: 40px; line-height: 1; margin-bottom: 8px; }
+.rank-detail-name {
+  margin: 0 0 6px;
   font-family: var(--font-display);
-  font-weight: 700;
-  margin-bottom: 4px;
+  font-size: 22px;
+  color: var(--ink);
 }
-.rank-ladder-blurb p { margin: 0; font-size: 14px; line-height: 1.45; }
+.rank-detail-xp {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.rank-detail-blurb {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  text-align: left;
+}
 
 .rank-card-open {
   display: block;
@@ -958,12 +981,22 @@ button {
 .virtue-blurb { font-size: 12.5px; color: var(--ink-soft); display: block; }
 
 .reflection-card,
-.reflection-saved {
+.reflection-saved,
+.practice-card,
+.practice-saved,
+.place-seal {
   background: #f4ead2;
   border: 1px solid var(--gold);
   border-radius: var(--radius);
   padding: 14px;
 }
+.place-seal-progress {
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin: 0 0 8px;
+}
+.practice-card .btn { margin-top: 4px; }
 
 .reflection-intro { font-size: 13px; color: var(--ink-soft); margin: 0 0 10px; }
 

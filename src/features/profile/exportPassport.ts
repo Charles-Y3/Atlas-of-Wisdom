@@ -5,6 +5,7 @@ import type { Localized, Locale } from '../../i18n/types';
 import { L } from '../../i18n/L';
 import { rankForXp } from '../../engine/progression';
 import { virtueCounts } from '../../state/store';
+import type { Reflection, VirtuePractice } from '../../state/store';
 import { capturePassportGlobe } from './capturePassportGlobe';
 
 function resolve(loc: Localized<string>, locale: Locale): string {
@@ -29,9 +30,6 @@ function drawFallbackGlobe(ctx: CanvasRenderingContext2D, cx: number, cy: number
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.fillStyle = ocean;
   ctx.fill();
-  ctx.strokeStyle = '#b08a3c';
-  ctx.lineWidth = 2.5;
-  ctx.stroke();
 }
 
 /**
@@ -42,15 +40,16 @@ export async function exportPassportPng(
   progress: {
     xp: number;
     streak: { count: number };
-    read: Record<string, true>;
     visited: Record<string, string>;
+    reflections: Record<string, Reflection>;
+    practices: Record<string, VirtuePractice>;
     completedCollections: string[];
   },
   locale: Locale,
   appName: string,
 ): Promise<void> {
   const rank = rankForXp(progress.xp);
-  const counts = virtueCounts(progress.read);
+  const counts = virtueCounts(progress.reflections, progress.practices);
   const topCollectionId = progress.completedCollections[progress.completedCollections.length - 1];
   const topCollection = COLLECTIONS.find((c) => c.id === topCollectionId);
 
@@ -111,8 +110,8 @@ export async function exportPassportPng(
   }
 
   const gx = W / 2;
-  const gy = 400;
-  const gr = 118;
+  const gy = 415;
+  const gr = 168;
   ctx.save();
   ctx.beginPath();
   ctx.arc(gx, gy, gr, 0, Math.PI * 2);
@@ -123,11 +122,6 @@ export async function exportPassportPng(
     drawFallbackGlobe(ctx, gx, gy, gr);
   }
   ctx.restore();
-  ctx.beginPath();
-  ctx.arc(gx, gy, gr, 0, Math.PI * 2);
-  ctx.strokeStyle = '#b08a3c';
-  ctx.lineWidth = 2.5;
-  ctx.stroke();
 
   const axes = VIRTUES.map((v) => {
     const total = LOCATIONS.filter((l) => l.virtues.includes(v.id)).length;
@@ -138,9 +132,9 @@ export async function exportPassportPng(
   ctx.textAlign = 'left';
   ctx.font = '700 18px Cinzel, serif';
   ctx.fillStyle = '#6b4f2a';
-  ctx.fillText('Virtue Compass', 80, 560);
+  ctx.fillText('Virtue Compass', 80, 620);
 
-  let y = 590;
+  let y = 650;
   for (const { v, ratio, got, total } of axes) {
     ctx.font = '16px "Segoe UI Emoji", sans-serif';
     ctx.fillText(v.emoji, 80, y + 4);

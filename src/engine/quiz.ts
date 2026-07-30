@@ -69,3 +69,35 @@ export function dailyQuizQuestions(dayKey: string): QuizQuestion[] {
   }
   return questions;
 }
+
+/**
+ * Two mastery-gated questions that seal a place as "visited".
+ * Drawn from the place's country / tradition / category — never from
+ * unfound quest hints.
+ */
+export function placeCheckQuestions(locationId: string): QuizQuestion[] {
+  const loc = LOCATIONS.find((l) => l.id === locationId);
+  if (!loc) return [];
+  const kinds: QuizKind[] = ['country', loc.traditions.length ? 'tradition' : 'category'];
+  if (kinds[1] === 'tradition' && loc.traditions.length === 0) kinds[1] = 'category';
+  // Prefer country + category when tradition decoys are thin.
+  if (kinds[1] === 'tradition' && decoyPool(loc, 'tradition').length < 3) {
+    kinds[1] = 'category';
+  }
+
+  return kinds.map((kind, qi) => {
+    const correct = answerFor(loc, kind);
+    const pool = decoyPool(loc, kind);
+    const order = seededOrder(`place-check:${locationId}:decoys:${qi}`, pool.length);
+    const decoys = order.slice(0, Math.min(3, pool.length)).map((i) => pool[i]);
+    const options = [correct, ...decoys];
+    const shuffle = seededOrder(`place-check:${locationId}:opts:${qi}`, options.length);
+    const shuffled = shuffle.map((i) => options[i]);
+    return {
+      location: loc,
+      kind,
+      options: shuffled,
+      correctIndex: shuffle.indexOf(0),
+    };
+  });
+}
