@@ -1,0 +1,513 @@
+Atlas of Wisdom
+Product Development Plan (Version 1.0)
+Vision
+
+Atlas of Wisdom is an interactive educational platform that allows users to explore the world's spiritual, philosophical, and cultural heritage through geography, history, and storytelling.
+
+It is not simply a map of places, but an atlas of ideas—showing where wisdom traditions originated, how they spread across civilisations, and how influential people, sacred places, and timeless teachings shaped humanity.
+
+Users become explorers, historians, and collectors, embarking on a lifelong journey of discovery.
+
+Tagline
+
+Discover the places that shaped humanity's wisdom.
+
+Mission
+
+To make the world's spiritual and philosophical heritage accessible, engaging, and enjoyable for everyone by combining interactive maps, historical storytelling, gamification, and exploration.
+
+Product Philosophy
+
+Atlas of Wisdom is founded on four principles:
+
+Explore — Curiosity begins with discovery.
+Understand — Learn the historical and cultural significance of places and people.
+Connect — Discover relationships between ideas, traditions, and civilisations.
+Preserve — Appreciate humanity's shared cultural heritage.
+
+Unlike a travel guide, Atlas of Wisdom encourages intellectual exploration rather than physical tourism.
+
+Position Within the Great Harmony Suite
+Application	Purpose
+Words of Sages	Discover wisdom through quotations and teachings
+Journey to Great Harmony	Apply wisdom through daily cultivation
+Atlas of Wisdom	Discover where wisdom came from and how it spread
+
+Together, the three applications answer three fundamental questions:
+
+What did the great teachers teach?
+How can I practise those teachings?
+Where did these teachings originate and how did they influence the world?
+Core User Journey
+Discover
+      ↓
+Explore
+      ↓
+Learn
+      ↓
+Collect
+      ↓
+Complete Adventures
+      ↓
+Become a Master Explorer
+
+The application rewards curiosity rather than speed.
+
+Home Screen
+
+The homepage opens to an animated interactive globe.
+
+Features include:
+
+Interactive 3D globe
+Search by place, person, or tradition
+Featured discovery of the day
+Historical anniversaries
+Daily exploration challenge
+Continue previous expedition
+Personal achievements
+Community discoveries
+
+The interface should encourage users to click anywhere and begin exploring.
+
+Main Modules
+Module 1 — Interactive World Atlas
+
+The heart of the application.
+
+Users explore the world through an interactive map.
+
+Categories include:
+
+Temples
+Churches
+Mosques
+Monasteries
+Shrines
+Sacred mountains
+Historic academies
+Ancient universities
+Libraries
+Pilgrimage routes
+Archaeological sites
+UNESCO World Heritage Sites
+Ancient capitals
+Historic cities
+
+Every location becomes an entry point into history.
+
+Every Location Includes
+Overview
+Name
+Country
+Region
+Geographic coordinates
+Historical period
+Tradition(s)
+Current status
+UNESCO designation (if applicable)
+Photo Gallery
+Modern photography
+Historical illustrations
+Architectural details
+Satellite imagery
+Interior views
+360° panoramas (where available)
+Historical Timeline
+
+An interactive timeline showing how the site evolved.
+
+Example:
+
+551 BC — Confucius born
+478 BC — Early memorial site established
+960 AD — Major expansion
+1724 AD — Imperial restoration
+Present — UNESCO World Heritage Site
+Why This Place Matters
+
+A concise explanation covering:
+
+Historical significance
+Cultural influence
+Spiritual importance
+Contribution to civilisation
+Architecture
+
+Interactive explanations covering:
+
+Building layout
+Symbolism
+Construction methods
+Artistic features
+Unique architectural elements
+Connected People
+
+Every location links to influential figures associated with it.
+
+Example:
+
+Temple of Confucius
+
+↓
+
+Confucius
+
+↓
+
+Zengzi
+
+↓
+
+Mencius
+
+↓
+
+Zhu Xi
+
+Each profile opens another layer of exploration.
+
+Module 2 — Follow Great Historical Figures
+
+One of the application's signature features.
+
+Instead of reading biographies, users follow a person's life as an interactive journey.
+
+Examples:
+
+Confucius
+Laozi
+Buddha
+Jesus
+Socrates
+Plato
+Aristotle
+Xuanzang
+Marco Polo
+Ibn Battuta
+Zheng He
+Mother Teresa
+Interactive Life Journey
+
+Each historical figure includes:
+
+Birthplace
+Early life
+Travels
+Important events
+Key teachings
+Disciples
+Legacy
+
+The journey is presented as an animated map with a chronological timeline.
+
+Users travel alongside the historical figure, unlocking locations as the story unfolds.
+
+Module 3 — Historical Expeditions
+
+Users can follow famous historical journeys.
+
+Examples include:
+
+Journey of Confucius
+Buddha's path to enlightenment
+Xuanzang's pilgrimage to India
+Silk Road
+Paul's missionary journeys
+Marco Polo's travels
+Zheng He's voyages
+Ibn Battuta's explorations
+
+Each expedition combines maps, historical events, stories, and quizzes.
+
+Module 4 — Discovery Mode
+
+For users who simply wish to explore.
+
+One tap reveals a random discovery.
+
+Examples:
+
+An ancient monastery in Armenia
+A forgotten Confucian academy
+A sacred mountain in Japan
+A UNESCO cave temple
+A historical library in Timbuktu
+
+Every discovery becomes a new learning opportunity.
+
+Module 5 — Explorer Quests
+
+Gamified exploration.
+
+Examples:
+
+Visit every UNESCO Buddhist site.
+Find ten sacred mountains.
+Explore every Confucian heritage site.
+Complete the Silk Road.
+Discover all ancient universities.
+Visit every World Heritage cathedral.
+
+Each completed quest unlocks rewards.
+
+Module 6 — Hidden Discoveries
+
+Interactive challenges encourage close observation.
+
+Examples:
+
+Locate:
+
+Lotus flower
+Dragon carving
+Dharma Wheel
+Phoenix
+Bell tower
+Ancient inscription
+Turtle monument
+
+This transforms exploration into a game.
+
+Module 7 — Collections
+
+Everything discovered becomes collectible.
+
+Collections include:
+
+Sacred temples
+Historic monasteries
+Ancient libraries
+Philosophers
+Religious founders
+Great teachers
+Pilgrimage sites
+Sacred mountains
+UNESCO sites
+Ancient universities
+
+Users gradually build a complete Atlas collection.
+
+Module 8 — Time Explorer
+
+Move a timeline slider from ancient history to the present.
+
+Example:
+
+5000 BC
+
+↓
+
+2000 BC
+
+↓
+
+1000 BC
+
+↓
+
+500 BC
+
+↓
+
+0
+
+↓
+
+1000 AD
+
+↓
+
+1500 AD
+
+↓
+
+1800
+
+↓
+
+Present
+
+The world map updates dynamically, showing only locations and civilisations that existed during the selected era.
+
+Users literally watch human civilisation evolve.
+
+Module 9 — Compare Explorer
+
+Compare two places or historical figures side by side.
+
+Examples:
+
+Shaolin Temple vs Mount Wudang
+
+Confucius vs Socrates
+
+Nalanda vs Alexandria Library
+
+Comparisons include:
+
+Timeline
+Geography
+Architecture
+Influence
+Teachings
+Legacy
+Module 10 — Wisdom Network
+
+A living knowledge graph connecting everything.
+
+Connections include:
+
+People
+Places
+Books
+Virtues
+Historical events
+Traditions
+Schools of thought
+
+Selecting one node reveals an expanding web of related knowledge, encouraging endless exploration.
+
+Gamification
+Experience
+
+Users gain experience by:
+
+Exploring locations
+Completing expeditions
+Reading articles
+Finishing quizzes
+Discovering hidden objects
+Completing collections
+Daily exploration
+Explorer Ranks
+Seeker
+Explorer
+Traveller
+Historian
+Scholar
+Researcher
+Master Explorer
+Wisdom Cartographer
+Achievements
+
+Examples include:
+
+First Discovery
+Around the World
+Confucian Heritage Explorer
+Sacred Mountains
+UNESCO Collector
+Silk Road Master
+World Heritage Guardian
+Wisdom Cartographer
+Daily Engagement
+
+Every day offers fresh reasons to return.
+
+Daily features include:
+
+Discovery of the Day
+Place of the Day
+Historical anniversary
+Daily quiz
+Treasure hunt
+Explorer challenge
+Quote connected to a featured location
+New collection opportunity
+
+Sessions are designed to take between five and fifteen minutes.
+
+Community Features
+
+Users can:
+
+Follow friends
+Share favourite discoveries
+Join exploration groups
+Participate in monthly exploration events
+Compare collections
+Collaborate on themed expeditions
+
+Leaderboards focus on learning rather than competition.
+
+Examples:
+
+Most locations explored
+Most historical journeys completed
+Largest collection
+Longest exploration streak
+Integration with the Great Harmony Suite
+Words of Sages
+
+Every quotation links directly to:
+
+Historical figures
+Places
+Books
+Timeline events
+
+Users move seamlessly from reading wisdom to discovering its historical context.
+
+Journey to Great Harmony
+
+Weekly cultivation activities include:
+
+Explore one sacred location.
+Learn one historical lesson.
+Reflect on how the location influenced society.
+Earn Harmony Experience.
+
+Learning history reinforces personal cultivation.
+
+Future Expansion
+Pilgrimage Mode
+
+Virtually accompany great historical journeys, unlocking locations and stories in sequence. Examples include the journeys of Confucius, Xuanzang, the Buddha, Paul, and the Camino de Santiago.
+
+Architecture Explorer
+
+Study architectural styles, symbols, and construction across cultures through interactive models and recognition games.
+
+UNESCO Heritage Explorer
+
+A dedicated mode for exploring UNESCO-recognised cultural and spiritual heritage, with regional challenges and curated collections.
+
+Cultural Festivals Calendar
+
+An annual calendar highlighting major cultural and religious festivals, their origins, associated places, customs, and historical significance.
+
+Before & After Explorer
+
+Compare archaeological reconstructions, historical illustrations, and present-day photographs using interactive sliders to understand how important sites have changed through time.
+
+Story Trails
+
+Follow themed routes connecting multiple places into a narrative, such as:
+
+Birth of Buddhism
+Spread of Confucianism
+Ancient Centres of Learning
+Sacred Mountains of Asia
+The Silk Road
+Mystery Explorer
+
+A daily puzzle mode where users solve location-based mysteries using historical clues, maps, and architectural details.
+
+Time Traveller
+
+Select any historical year and experience the world as it existed then, revealing contemporary civilisations, active historical figures, and significant sites.
+
+Living Connections
+
+An ever-expanding interactive network that reveals relationships among people, places, texts, virtues, and historical events, allowing users to explore knowledge organically rather than linearly.
+
+Long-Term Vision
+
+Atlas of Wisdom seeks to become the world's most engaging interactive atlas of humanity's intellectual, philosophical, and spiritual heritage. Rather than presenting isolated facts, it invites users to journey through the interconnected stories of people, places, ideas, and cultures.
+
+By combining geography, history, exploration, and gamification, it transforms learning into an ongoing adventure. Users do not simply read about history—they follow the footsteps of remarkable individuals, uncover forgotten places, solve exploration challenges, build collections, and gradually develop a richer understanding of the shared heritage of humanity.
+
+The central message is:
+
+Every place tells a story. Every story carries wisdom. Every journey deepens understanding.

@@ -1,0 +1,128 @@
+import { localized } from '../i18n/types';
+import type { AchievementDef } from './types';
+import { LEGENDS } from './legends';
+
+export const ACHIEVEMENTS: AchievementDef[] = [
+  {
+    id: 'first-discovery',
+    name: localized('First Discovery', '初次发现'),
+    emoji: '📍',
+    description: localized('Explore your first place.', '探索你的第一个地点。'),
+    check: (s) => s.placesExplored >= 1,
+  },
+  {
+    id: 'ten-pins',
+    name: localized('Ten Pins on the Map', '地图十标'),
+    emoji: '🧷',
+    description: localized('Explore ten places.', '探索十个地点。'),
+    check: (s) => s.placesExplored >= 10,
+  },
+  {
+    id: 'around-the-world',
+    name: localized('Around the World', '环游世界'),
+    emoji: '🌐',
+    description: localized('Reach five continents.', '到达五大洲。'),
+    check: (s) => s.continentsReached >= 5,
+  },
+  {
+    id: 'deep-reader',
+    name: localized('Deep Reader', '深度读者'),
+    emoji: '📖',
+    description: localized('Read five place stories to the end.', '读完五个地点的完整故事。'),
+    check: (s) => s.storiesRead >= 5,
+  },
+  {
+    id: 'keeper-of-stories',
+    name: localized('Keeper of Stories', '故事守护者'),
+    emoji: '🏮',
+    description: localized('Read twenty-five stories to the end.', '读完二十五个完整故事。'),
+    check: (s) => s.storiesRead >= 25,
+  },
+  {
+    id: 'first-collection',
+    name: localized('The Collector', '收藏家'),
+    emoji: '🗃️',
+    description: localized('Complete your first collection.', '集齐你的第一个收藏。'),
+    check: (s) => s.collectionsCompleted >= 1,
+  },
+  {
+    id: 'grand-collector',
+    name: localized('Grand Collector', '大收藏家'),
+    emoji: '🏆',
+    description: localized('Complete four collections.', '集齐四个收藏。'),
+    check: (s) => s.collectionsCompleted >= 4,
+  },
+  {
+    id: 'streak-3',
+    name: localized('Three-Day Journey', '三日之旅'),
+    emoji: '🕯️',
+    description: localized('Explore three days in a row.', '连续探索三天。'),
+    check: (s) => s.streak >= 3,
+  },
+  {
+    id: 'streak-7',
+    name: localized('A Week of Wonders', '七日奇观'),
+    emoji: '🔥',
+    description: localized('Explore seven days in a row.', '连续探索七天。'),
+    check: (s) => s.streak >= 7,
+  },
+  {
+    id: 'streak-30',
+    name: localized('The Long Road', '长路'),
+    emoji: '🛤️',
+    description: localized('Explore thirty days in a row.', '连续探索三十天。'),
+    check: (s) => s.streak >= 30,
+  },
+  {
+    id: 'serendipity',
+    name: localized('Serendipity', '妙手偶得'),
+    emoji: '🎲',
+    description: localized('Make ten random discoveries.', '完成十次随机发现。'),
+    check: (s) => s.discoveriesMade >= 10,
+  },
+  {
+    id: 'first-reflection',
+    name: localized('Look Inward', '内观'),
+    emoji: '🪞',
+    description: localized('Write your first reflection.', '写下你的第一篇反思。'),
+    check: (s) => s.reflectionsWritten >= 1,
+  },
+  {
+    id: 'reflective-traveller',
+    name: localized('The Reflective Traveller', '省思的旅人'),
+    emoji: '🕊️',
+    description: localized('Write ten reflections.', '写下十篇反思。'),
+    check: (s) => s.reflectionsWritten >= 10,
+  },
+  {
+    id: 'full-compass',
+    name: localized('Full Compass', '罗盘周全'),
+    emoji: '🧿',
+    description: localized('Read stories that touch all nine virtues.', '读完触及全部九种德行的故事。'),
+    check: (s) => s.virtuesTouched >= 9,
+  },
+  {
+    id: 'quiz-whiz',
+    name: localized('Quiz Whiz', '问答达人'),
+    emoji: '💡',
+    description: localized('Complete five daily quizzes.', '完成五次每日问答。'),
+    check: (s) => s.quizzesCompleted >= 5,
+  },
+  {
+    id: 'beyond-the-map',
+    name: localized('Beyond the Map', '地图之外'),
+    emoji: '📜',
+    description: localized(
+      'Unlock the Legends layer by reading twelve stories.',
+      '通过读完十二个故事，解锁传说层。',
+    ),
+    check: (s) => s.storiesRead >= 12,
+  },
+  {
+    id: 'legend-seeker',
+    name: localized('Legend Seeker', '传说寻访者'),
+    emoji: '🔮',
+    description: localized('Explore every legendary place.', '探索每一处传说之地。'),
+    check: (s) => s.legendsExplored >= LEGENDS.length,
+  },
+];
