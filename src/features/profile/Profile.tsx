@@ -134,18 +134,25 @@ export default function Profile() {
                 disabled={exporting}
                 onClick={() => {
                   setExporting(true);
-                  void exportPassportPng(
-                    {
-                      xp: progress.xp,
-                      streak: progress.streak,
-                      visited: progress.visited,
-                      reflections: progress.reflections ?? {},
-                      practices: progress.practices ?? {},
-                      completedCollections: progress.completedCollections,
-                    },
-                    locale,
-                    t('appName'),
-                  ).finally(() => setExporting(false));
+                void exportPassportPng(
+                  {
+                    xp: progress.xp,
+                    streak: progress.streak,
+                    visited: progress.visited,
+                    read: progress.read,
+                    reflections: progress.reflections ?? {},
+                    practices: progress.practices ?? {},
+                    completedCollections: progress.completedCollections,
+                    achievements: progress.achievements,
+                    discoveriesMade: progress.discoveriesMade,
+                    quizzesCompleted: progress.quizzesCompleted,
+                    exploredLegends: progress.exploredLegends,
+                    completedQuests: progress.completedQuests,
+                    questProgress: progress.questProgress,
+                  },
+                  locale,
+                  t('appName'),
+                ).finally(() => setExporting(false));
                 }}
               >
                 🛂 {exporting ? t('loading') : t('profileExportPassport')}

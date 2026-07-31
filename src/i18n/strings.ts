@@ -351,6 +351,14 @@ export const UI = {
   ),
   profileAbout: localized('Part of the Great Harmony suite', '大同系列应用之一'),
   profileExportPassport: localized('Export passport', '导出探索护照'),
+  passportMoreAchievements: localized('+{n} more', '另有 {n} 项'),
+  passportAchievementsEmpty: localized(
+    'Milestones will appear here as you explore.',
+    '探索途中解锁的里程碑，会出现在这里。',
+  ),
+  passportRibbonQuests: localized('{n} quests done', '已完成旅程 {n}'),
+  passportRibbonLegends: localized('{n} legends', '传说 {n}'),
+
   journalTitle: localized('My Reflections', '我的反思'),
   journalEmpty: localized(
     'Finish a story and take a moment to reflect — your words stay here, private and local.',
