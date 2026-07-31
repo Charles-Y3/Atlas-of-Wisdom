@@ -6,7 +6,6 @@ import { L } from '../../i18n/L';
 import { rankForXp, xpUnlocks } from '../../engine/progression';
 import { virtueCounts } from '../../state/store';
 import type { Reflection, VirtuePractice } from '../../state/store';
-import { capturePassportGlobe } from './capturePassportGlobe';
 
 function resolve(loc: Localized<string>, locale: Locale): string {
   return L(loc, locale);
@@ -21,20 +20,41 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-/** Fallback parchment sphere if MapLibre capture fails. */
-function drawFallbackGlobe(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number): void {
-  const ocean = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.3, r * 0.1, cx, cy, r);
-  ocean.addColorStop(0, '#d9e4d0');
-  ocean.addColorStop(1, '#a8b89a');
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI * 2);
-  ctx.fillStyle = ocean;
-  ctx.fill();
+function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  if (!text) return [];
+  const lines: string[] = [];
+  const hasCjk = /[\u4e00-\u9fff]/.test(text);
+  if (!hasCjk && /\s/.test(text)) {
+    let line = '';
+    for (const word of text.split(/\s+/)) {
+      const test = line ? `${line} ${word}` : word;
+      if (line && ctx.measureText(test).width > maxWidth) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+  let line = '';
+  for (const ch of text) {
+    const test = line + ch;
+    if (line && ctx.measureText(test).width > maxWidth) {
+      lines.push(line);
+      line = ch;
+    } else {
+      line = test;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
 }
 
 /**
  * Draw a shareable explorer passport to canvas and trigger a PNG download.
- * Globe uses the online MapLibre style when reachable.
+ * Center art uses the app icon.
  */
 export async function exportPassportPng(
   progress: {
@@ -54,13 +74,14 @@ export async function exportPassportPng(
   const topCollectionId = progress.completedCollections[progress.completedCollections.length - 1];
   const topCollection = COLLECTIONS.find((c) => c.id === topCollectionId);
 
-  const globeUrl = await capturePassportGlobe(Object.keys(progress.visited));
-  let globeImg: HTMLImageElement | null = null;
-  if (globeUrl) {
+  let iconImg: HTMLImageElement | null = null;
+  try {
+    iconImg = await loadImage(`${import.meta.env.BASE_URL}icons/icon-512.png`);
+  } catch {
     try {
-      globeImg = await loadImage(globeUrl);
+      iconImg = await loadImage(`${import.meta.env.BASE_URL}icons/icon.png`);
     } catch {
-      globeImg = null;
+      iconImg = null;
     }
   }
 
@@ -89,7 +110,6 @@ export async function exportPassportPng(
     ctx.strokeStyle = '#8a6a2a';
     ctx.lineWidth = 1.5;
     ctx.strokeRect(44, 44, W - 88, H - 88);
-    // Corner flourishes
     const mark = (x: number, y: number, sx: number, sy: number) => {
       ctx.beginPath();
       ctx.moveTo(x, y + 28 * sy);
@@ -123,32 +143,49 @@ export async function exportPassportPng(
   ctx.fillStyle = '#6b4f2a';
   ctx.fillText(resolve(rank.name, locale), W / 2, 178);
 
+  // Same rank blurb as the rank-ladder detail popup.
+  ctx.font = '15px "Noto Serif", "Noto Serif SC", "Noto Serif TC", serif';
+  ctx.fillStyle = '#5c4a32';
+  const blurbLines = wrapLines(ctx, resolve(rank.blurb, locale), W - 120);
+  let y = 204;
+  for (const line of blurbLines.slice(0, 4)) {
+    ctx.fillText(line, W / 2, y);
+    y += 22;
+  }
+  y += 10;
+
   ctx.font = '16px "Noto Serif", "Noto Serif SC", serif';
   ctx.fillStyle = '#5c4a32';
-  ctx.fillText(`${progress.xp} XP · ${progress.streak.count} 🔥`, W / 2, 210);
+  ctx.fillText(`${progress.xp} XP · ${progress.streak.count} 🔥`, W / 2, y);
+  y += 28;
 
   if (topCollection) {
     ctx.font = '15px "Noto Serif", "Noto Serif SC", serif';
     ctx.fillText(
       `${topCollection.emoji} ${resolve(topCollection.name, locale)}`,
       W / 2,
-      238,
+      y,
     );
+    y += 24;
   }
 
-  const gx = W / 2;
-  const gy = 415;
-  const gr = 168;
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(gx, gy, gr, 0, Math.PI * 2);
-  ctx.clip();
-  if (globeImg) {
-    ctx.drawImage(globeImg, gx - gr, gy - gr, gr * 2, gr * 2);
-  } else {
-    drawFallbackGlobe(ctx, gx, gy, gr);
+  const iconSize = 300;
+  const iconTop = Math.min(y + 12, 360);
+  const iconLeft = (W - iconSize) / 2;
+  if (iconImg) {
+    const r = 36;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(iconLeft + r, iconTop);
+    ctx.arcTo(iconLeft + iconSize, iconTop, iconLeft + iconSize, iconTop + iconSize, r);
+    ctx.arcTo(iconLeft + iconSize, iconTop + iconSize, iconLeft, iconTop + iconSize, r);
+    ctx.arcTo(iconLeft, iconTop + iconSize, iconLeft, iconTop, r);
+    ctx.arcTo(iconLeft, iconTop, iconLeft + iconSize, iconTop, r);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(iconImg, iconLeft, iconTop, iconSize, iconSize);
+    ctx.restore();
   }
-  ctx.restore();
 
   const axes = VIRTUES.map((v) => {
     const total = LOCATIONS.filter((l) => l.virtues.includes(v.id)).length;
@@ -156,26 +193,28 @@ export async function exportPassportPng(
     return { v, ratio: total > 0 ? got / total : 0, got, total };
   });
 
+  const compassTop = Math.max(iconTop + iconSize + 28, 620);
   ctx.textAlign = 'left';
   ctx.font = '700 18px Cinzel, serif';
   ctx.fillStyle = '#6b4f2a';
-  ctx.fillText('Virtue Compass', 80, 620);
+  ctx.fillText('Virtue Compass', 80, compassTop);
 
-  let y = 650;
+  let rowY = compassTop + 30;
+  const rowStep = Math.min(36, (H - 80 - rowY) / axes.length);
   for (const { v, ratio, got, total } of axes) {
     ctx.font = '16px "Segoe UI Emoji", sans-serif';
-    ctx.fillText(v.emoji, 80, y + 4);
+    ctx.fillText(v.emoji, 80, rowY + 4);
     ctx.font = '14px "Noto Serif", "Noto Serif SC", serif';
     ctx.fillStyle = '#2b2416';
-    ctx.fillText(resolve(v.name, locale), 110, y);
+    ctx.fillText(resolve(v.name, locale), 110, rowY);
     ctx.fillStyle = '#e8dcc4';
-    ctx.fillRect(300, y - 12, 320, 14);
+    ctx.fillRect(300, rowY - 12, 320, 14);
     ctx.fillStyle = '#b08a3c';
-    ctx.fillRect(300, y - 12, 320 * Math.max(ratio, 0.02), 14);
+    ctx.fillRect(300, rowY - 12, 320 * Math.max(ratio, 0.02), 14);
     ctx.fillStyle = '#5c4a32';
     ctx.font = '12px "Noto Serif", sans-serif';
-    ctx.fillText(`${got}/${total}`, 630, y);
-    y += 36;
+    ctx.fillText(`${got}/${total}`, 630, rowY);
+    rowY += rowStep;
   }
 
   ctx.textAlign = 'center';
