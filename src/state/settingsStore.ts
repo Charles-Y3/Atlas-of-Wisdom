@@ -23,7 +23,7 @@ interface SettingsState {
 export const useSettings = create<SettingsState>()(
   persist(
     (set) => ({
-      detailedMapWhenOnline: false,
+      detailedMapWhenOnline: true,
       setDetailedMapWhenOnline: (detailedMapWhenOnline) => set({ detailedMapWhenOnline }),
       youngerExplorer: false,
       setYoungerExplorer: (youngerExplorer) => set({ youngerExplorer }),
@@ -35,12 +35,16 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: 'atlas-settings',
-      version: 2,
+      version: 3,
       migrate: (persisted, version) => {
         const p = (persisted ?? {}) as Record<string, unknown>;
         // Existing installs already chose language — skip the new prefs gate.
         if (version < 2) {
-          return { ...p, prefsChosen: true };
+          p.prefsChosen = true;
+        }
+        // Detailed online map is now on by default (was false for earlier installs).
+        if (version < 3) {
+          p.detailedMapWhenOnline = true;
         }
         return p;
       },

@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useT } from '../../i18n/useT';
-import { RANKS, nextRankForXp, rankForXp, type Rank } from '../../engine/progression';
+import type { UiKey } from '../../i18n/strings';
+import {
+  RANKS,
+  RANK_UNLOCK_KEY,
+  nextRankForXp,
+  rankForXp,
+  type Rank,
+} from '../../engine/progression';
 
 /** Centered popup listing ranks; tap a row for a detail popup. */
 export default function RankLadder({
@@ -22,6 +29,11 @@ export default function RankLadder({
   }, [open]);
 
   if (!open) return null;
+
+  const unlockLine = (rank: Rank) => {
+    const key = RANK_UNLOCK_KEY[rank.id];
+    return key ? t(key as UiKey) : '';
+  };
 
   return (
     <div
@@ -59,6 +71,10 @@ export default function RankLadder({
             )}
           </p>
           <p className="rank-detail-blurb">{L(detail.blurb)}</p>
+          <p className="rank-detail-unlock">
+            <span className="rank-detail-unlock-label">{t('rankLadderUnlocks')}</span>
+            {unlockLine(detail)}
+          </p>
         </div>
       ) : (
         <div

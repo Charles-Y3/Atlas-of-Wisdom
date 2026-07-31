@@ -101,12 +101,12 @@ export const VIRTUES: Virtue[] = [
       '你想勇敢地试一试什么？',
     ),
     practice: localized(
-      'Name one fear out loud, then take the smallest next step anyway.',
-      '大声说出一个恐惧，然后仍迈出最小的下一步。',
+      'Name one thing you have been putting off, then take the smallest next step.',
+      '说出一件你一直在拖延的事，然后迈出最小的下一步。',
     ),
     practiceYoung: localized(
-      'Try something a little scary — even a tiny try counts.',
-      '试一件有点吓人的事 — 小小的尝试也算。',
+      'Try one small brave thing today — even a tiny try counts.',
+      '今天试一件小小的勇敢的事 — 小小的尝试也算。',
     ),
   },
   {

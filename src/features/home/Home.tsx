@@ -10,7 +10,7 @@ import { unlockedQuests } from '../../data/quests';
 import { formatYear } from '../../data/types';
 import { monthKey, onThisDayPick, pickIndex, todayKey } from '../../engine/daily';
 import { useProgress, statsOf } from '../../state/store';
-import { rankForXp } from '../../engine/progression';
+import { rankForXp, xpUnlocks } from '../../engine/progression';
 import DailyQuiz from './DailyQuiz';
 import StreakRitual from '../profile/StreakRitual';
 import RankLadder from '../profile/RankLadder';
@@ -50,11 +50,15 @@ export default function Home() {
   }, []);
 
   const questOfMonth = useMemo(() => {
-    const pool = unlockedQuests(completedQuests);
+    const pool = unlockedQuests(completedQuests, progress.xp);
     if (pool.length === 0) return null;
     const idx = pickIndex(`questMonth:${monthKey()}`, pool.length);
     return pool[idx];
-  }, [completedQuests]);
+  }, [completedQuests, progress.xp]);
+
+  const showOnThisDay = xpUnlocks(progress.xp, 'onThisDay');
+  const showTeachingOfDay = xpUnlocks(progress.xp, 'teachingOfDay');
+  const isCartographer = xpUnlocks(progress.xp, 'cartographerPassport');
 
   const greeting =
     stats.placesExplored === 0
@@ -156,7 +160,11 @@ export default function Home() {
               <div className="stat-num">{stats.placesExplored}</div>
               <div className="stat-label">{t('homeExplored')}</div>
             </div>
-            <button type="button" className="stat-box stat-box-btn" onClick={() => setRankOpen(true)}>
+            <button
+              type="button"
+              className={`stat-box stat-box-btn ${isCartographer ? 'stat-box-cartographer' : ''}`}
+              onClick={() => setRankOpen(true)}
+            >
               <div className="stat-num">{rank.emoji}</div>
               <div className="stat-label">{L(rank.name)}</div>
             </button>
@@ -184,7 +192,7 @@ export default function Home() {
             </p>
           </Link>
 
-          {dailyTeaching.teaching && dailyTeaching.loc && (
+          {showTeachingOfDay && dailyTeaching.teaching && dailyTeaching.loc && (
             <Link
               to={`/location/${dailyTeaching.id}`}
               className="card feature-card teaching-card"
@@ -203,7 +211,7 @@ export default function Home() {
             </Link>
           )}
 
-          {onThisDay && (
+          {showOnThisDay && onThisDay && (
             <Link to={`/location/${onThisDay.loc.id}`} className="card feature-card">
               <div className="feature-kicker">📅 {t('homeOnThisDay')}</div>
               <h3 className="feature-title">

@@ -234,10 +234,11 @@ function QuestCard({
 export default function Quests() {
   const { t } = useT();
   const completedQuests = useProgress((s) => s.completedQuests);
+  const xp = useProgress((s) => s.xp);
   const [tier, setTier] = useState<QuestTier>('beginner');
   const [openId, setOpenId] = useState<string | null>(null);
 
-  const unlocked = questTierUnlocked(tier, completedQuests);
+  const unlocked = questTierUnlocked(tier, completedQuests, xp);
   const list = QUESTS_BY_TIER[tier];
   const prev = PREV_TIER[tier];
 
@@ -248,7 +249,7 @@ export default function Quests() {
 
       <div className="chip-row profile-tabs quest-tier-tabs" style={{ marginBottom: 12 }}>
         {QUEST_TIERS.map((tId) => {
-          const tierOpen = questTierUnlocked(tId, completedQuests);
+          const tierOpen = questTierUnlocked(tId, completedQuests, xp);
           return (
             <button
               key={tId}

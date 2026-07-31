@@ -637,6 +637,10 @@ button {
 .stat-box-btn:hover {
   border-color: var(--gold);
 }
+.stat-box-cartographer {
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 1px rgba(176, 138, 60, 0.35);
+}
 
 .rank-ladder-backdrop {
   position: fixed;
@@ -727,6 +731,21 @@ button {
   color: var(--ink);
   text-align: left;
 }
+.rank-detail-unlock {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  text-align: left;
+}
+.rank-detail-unlock-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--gold-deep);
+  margin-bottom: 4px;
+}
 
 .rank-card-open {
   display: block;
@@ -774,6 +793,15 @@ button {
   width: 100%;
   height: auto;
   display: block;
+}
+.quest-trail-dist {
+  font-size: 8.5px;
+  fill: var(--gold-deep);
+  font-family: var(--font-display);
+  paint-order: stroke;
+  stroke: var(--paper-deep);
+  stroke-width: 3px;
+  stroke-linejoin: round;
 }
 .quest-show-trail {
   margin-top: 8px;
@@ -1081,7 +1109,7 @@ button {
 /* ── Discovery ─────────────────────────────────────────────────────── */
 
 .discover-stage {
-  min-height: 340px;
+  min-height: 420px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1090,7 +1118,13 @@ button {
   gap: 14px;
 }
 
-.discover-globe-emoji { font-size: 84px; animation: float 3s ease-in-out infinite; }
+.discover-globe-emoji { font-size: 136px; animation: float 3s ease-in-out infinite; }
+
+.journey-disclaimer {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.45;
+}
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
@@ -1498,6 +1532,10 @@ button {
 /* ── Profile ───────────────────────────────────────────────────────── */
 
 .rank-card { text-align: center; padding: 22px 16px; }
+.rank-card-cartographer {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(176, 138, 60, 0.4), 0 8px 24px rgba(43, 36, 22, 0.08);
+}
 .rank-emoji { font-size: 44px; }
 .rank-name { font-size: 22px; font-family: var(--font-display); font-weight: 700; margin: 4px 0 2px; }
 .rank-blurb { font-size: 13.5px; color: var(--ink-soft); max-width: 420px; margin: 0 auto 12px; }

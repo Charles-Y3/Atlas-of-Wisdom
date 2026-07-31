@@ -4,7 +4,7 @@ import { useLocale } from '../../state/localeStore';
 import { useSettings } from '../../state/settingsStore';
 import { VISIBLE_LOCALES, LOCALE_LABELS } from '../../i18n/types';
 import { ACHIEVEMENTS } from '../../data/achievements';
-import { rankForXp, nextRankForXp } from '../../engine/progression';
+import { rankForXp, nextRankForXp, xpUnlocks } from '../../engine/progression';
 import { useProgress, statsOf } from '../../state/store';
 import {
   getDeferredInstallPrompt,
@@ -16,10 +16,12 @@ import {
 import VirtueCompass from './VirtueCompass';
 import StreakRitual from './StreakRitual';
 import ReflectionsJournal from './ReflectionsJournal';
+import PracticesJournal from './PracticesJournal';
 import RankLadder from './RankLadder';
 import { exportPassportPng } from './exportPassport';
 
 type Tab = 'overview' | 'journey' | 'achievements' | 'settings';
+type JourneySub = 'reflections' | 'practice';
 
 export default function Profile() {
   const { t, L, locale } = useT();
@@ -34,7 +36,10 @@ export default function Profile() {
   const stats = statsOf(progress);
   const rank = rankForXp(progress.xp);
   const next = nextRankForXp(progress.xp);
+  const canExportPassport = xpUnlocks(progress.xp, 'passportExport');
+  const isCartographer = xpUnlocks(progress.xp, 'cartographerPassport');
   const [tab, setTab] = useState<Tab>('overview');
+  const [journeySub, setJourneySub] = useState<JourneySub>('reflections');
   const [rankOpen, setRankOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [canInstall, setCanInstall] = useState(() => getDeferredInstallPrompt() !== null);
@@ -104,7 +109,7 @@ export default function Profile() {
         <>
           <StreakRitual count={stats.streak} />
 
-          <div className="card rank-card">
+          <div className={`card rank-card ${isCartographer ? 'rank-card-cartographer' : ''}`}>
             <button type="button" className="rank-card-open" onClick={() => setRankOpen(true)}>
               <div className="rank-emoji">{rank.emoji}</div>
               <div className="rank-name">{L(rank.name)}</div>
@@ -121,29 +126,35 @@ export default function Profile() {
                 </>
               )}
             </div>
-            <button
-              type="button"
-              className="btn secondary"
-              style={{ marginTop: 14 }}
-              disabled={exporting}
-              onClick={() => {
-                setExporting(true);
-                void exportPassportPng(
-                  {
-                    xp: progress.xp,
-                    streak: progress.streak,
-                    visited: progress.visited,
-                    reflections: progress.reflections ?? {},
-                    practices: progress.practices ?? {},
-                    completedCollections: progress.completedCollections,
-                  },
-                  locale,
-                  t('appName'),
-                ).finally(() => setExporting(false));
-              }}
-            >
-              🛂 {exporting ? t('loading') : t('profileExportPassport')}
-            </button>
+            {canExportPassport ? (
+              <button
+                type="button"
+                className="btn secondary"
+                style={{ marginTop: 14 }}
+                disabled={exporting}
+                onClick={() => {
+                  setExporting(true);
+                  void exportPassportPng(
+                    {
+                      xp: progress.xp,
+                      streak: progress.streak,
+                      visited: progress.visited,
+                      reflections: progress.reflections ?? {},
+                      practices: progress.practices ?? {},
+                      completedCollections: progress.completedCollections,
+                    },
+                    locale,
+                    t('appName'),
+                  ).finally(() => setExporting(false));
+                }}
+              >
+                🛂 {exporting ? t('loading') : t('profileExportPassport')}
+              </button>
+            ) : (
+              <p className="page-subtitle" style={{ marginTop: 14 }}>
+                {t('rankPassportLocked')}
+              </p>
+            )}
           </div>
 
           <div className="section">
@@ -172,8 +183,25 @@ export default function Profile() {
 
       {tab === 'journey' && (
         <>
+          <p className="page-subtitle journey-disclaimer">{t('journeyDisclaimer')}</p>
           <VirtueCompass />
-          <ReflectionsJournal />
+          <div className="chip-row profile-tabs" style={{ marginBottom: 14 }}>
+            <button
+              type="button"
+              className={`chip ${journeySub === 'reflections' ? 'active' : ''}`}
+              onClick={() => setJourneySub('reflections')}
+            >
+              {t('journeyTabReflections')}
+            </button>
+            <button
+              type="button"
+              className={`chip ${journeySub === 'practice' ? 'active' : ''}`}
+              onClick={() => setJourneySub('practice')}
+            >
+              {t('journeyTabPractice')}
+            </button>
+          </div>
+          {journeySub === 'reflections' ? <ReflectionsJournal /> : <PracticesJournal />}
         </>
       )}
 

@@ -459,7 +459,7 @@ export const useProgress = create<AtlasProgress>()(
 
         completeQuestStep: (questId, locationId) => {
           const s = get();
-          if (!isQuestUnlocked(questId, s.completedQuests)) return;
+          if (!isQuestUnlocked(questId, s.completedQuests, s.xp)) return;
           const next = snapshot(s);
           if (!awardQuestStep(next, questId, locationId)) return;
           // Naming a place also seals arrival.

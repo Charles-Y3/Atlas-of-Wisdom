@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { LOCATIONS } from '../../data/locations';
@@ -14,12 +14,13 @@ import { ONLINE_PROBE_MS, ONLINE_STYLE_URL } from './onlineStyle';
 
 /** Beyond this zoom every point is unclustered and gets a name label. */
 const CLUSTER_MAX_ZOOM = 4;
-const LABEL_MIN_ZOOM = 4.2;
-const COUNTRY_LABEL_MIN_ZOOM = 1.4;
-const COUNTRY_LABEL_MAX_ZOOM = 3.2;
-const CITY_LABEL_MIN_ZOOM = 3.2;
+const LABEL_MIN_ZOOM = CLUSTER_MAX_ZOOM;
+const COUNTRY_LABEL_MIN_ZOOM = 1.2;
+const COUNTRY_LABEL_MAX_ZOOM = 3.4;
+const CITY_LABEL_MIN_ZOOM = 3.0;
+const CITY_LABEL_MAX_ZOOM = LABEL_MIN_ZOOM;
 /** Max country names on screen at once — avoids Pacific clutter. */
-const MAX_COUNTRY_LABELS = 28;
+const MAX_COUNTRY_LABELS = 36;
 
 /** True when lng/lat faces the camera on a globe (hides far-side project() ghosts). */
 function isFrontHemisphere(map: maplibregl.Map, lng: number, lat: number): boolean {
@@ -111,6 +112,13 @@ interface Overlay {
   kind: OverlayKind;
 }
 
+const OVERLAY_CLASS: Record<OverlayKind, string> = {
+  cluster: 'map-cluster-count',
+  country: 'map-country-label',
+  city: 'map-city-label',
+  place: 'map-point-label',
+};
+
 function buildGeoJson(
   filterCategory: CategoryId | null | undefined,
   visitedIds: Set<string> | undefined,
@@ -198,7 +206,11 @@ export default function GlobeMap({
   onSelectRef.current = onSelect;
   const onStyleModeChangeRef = useRef(onStyleModeChange);
   onStyleModeChangeRef.current = onStyleModeChange;
-  const [overlays, setOverlays] = useState<Overlay[]>([]);
+  const overlayRootRef = useRef<HTMLDivElement>(null);
+  /** Live label nodes — mutated on move so HTML tracks the canvas without React lag. */
+  const overlayElsRef = useRef(new Map<string, HTMLSpanElement>());
+  /** Prefer keeping the same country names across frames to avoid identity flicker. */
+  const stickyCountryKeysRef = useRef<string[]>([]);
 
   const detailedMap = useSettings((s) => s.detailedMapWhenOnline);
 
@@ -209,7 +221,8 @@ export default function GlobeMap({
 
   const syncOverlays = useCallback(() => {
     const map = mapRef.current;
-    if (!map || !loadedRef.current) return;
+    const root = overlayRootRef.current;
+    if (!map || !loadedRef.current || !root) return;
     const items: Overlay[] = [];
     const zoom = map.getZoom();
     const offline = styleModeRef.current === 'offline';
@@ -237,30 +250,43 @@ export default function GlobeMap({
       }
     }
 
-    // Country labels: read from source (not radius-0 query), cull far side, cap count.
+    // Country labels: sticky set + nearest refill for empty slots.
     if (offline && zoom >= COUNTRY_LABEL_MIN_ZOOM && zoom < COUNTRY_LABEL_MAX_ZOOM && map.getSource('country-labels')) {
       const feats = map.querySourceFeatures('country-labels');
-      const scored: { lng: number; lat: number; name: string; dist: number }[] = [];
+      const byName = new Map<string, { lng: number; lat: number; name: string; dist: number }>();
       const c = map.getCenter();
       for (const f of feats) {
         if (f.geometry.type !== 'Point') continue;
         const [lng, lat] = f.geometry.coordinates as [number, number];
         const name = String(f.properties?.name ?? '');
         if (!name || !isFrontHemisphere(map, lng, lat)) continue;
+        const p = map.project([lng, lat]);
+        if (p.x < -20 || p.y < -20 || p.x > width + 20 || p.y > height + 20) continue;
         const dist = (lng - c.lng) ** 2 + (lat - c.lat) ** 2;
-        scored.push({ lng, lat, name, dist });
+        const prev = byName.get(name);
+        if (!prev || dist < prev.dist) byName.set(name, { lng, lat, name, dist });
       }
-      scored.sort((a, b) => a.dist - b.dist);
-      const seen = new Set<string>();
-      for (const s of scored) {
-        if (seen.has(s.name)) continue;
-        seen.add(s.name);
+
+      const kept: string[] = [];
+      for (const name of stickyCountryKeysRef.current) {
+        const s = byName.get(name);
+        if (!s) continue;
+        kept.push(name);
         pushPoint(s.lng, s.lat, s.name, 'country', `co${s.name}`);
-        if (seen.size >= MAX_COUNTRY_LABELS) break;
+        byName.delete(name);
       }
+      const refill = [...byName.values()].sort((a, b) => a.dist - b.dist);
+      for (const s of refill) {
+        if (kept.length >= MAX_COUNTRY_LABELS) break;
+        kept.push(s.name);
+        pushPoint(s.lng, s.lat, s.name, 'country', `co${s.name}`);
+      }
+      stickyCountryKeysRef.current = kept;
+    } else {
+      stickyCountryKeysRef.current = [];
     }
 
-    if (offline && zoom >= CITY_LABEL_MIN_ZOOM && zoom < LABEL_MIN_ZOOM && map.getLayer('cities')) {
+    if (offline && zoom >= CITY_LABEL_MIN_ZOOM && zoom < CITY_LABEL_MAX_ZOOM && map.getLayer('cities')) {
       for (const f of map.queryRenderedFeatures({ layers: ['cities'] })) {
         if (f.geometry.type !== 'Point') continue;
         const [lng, lat] = f.geometry.coordinates as [number, number];
@@ -283,7 +309,26 @@ export default function GlobeMap({
       }
     }
 
-    setOverlays(items);
+    const els = overlayElsRef.current;
+    const alive = new Set<string>();
+    for (const o of items) {
+      alive.add(o.key);
+      let el = els.get(o.key);
+      if (!el) {
+        el = document.createElement('span');
+        el.className = OVERLAY_CLASS[o.kind];
+        root.appendChild(el);
+        els.set(o.key, el);
+      }
+      if (el.textContent !== o.text) el.textContent = o.text;
+      el.style.left = `${o.x}px`;
+      el.style.top = `${o.y}px`;
+    }
+    for (const [key, el] of els) {
+      if (alive.has(key)) continue;
+      el.remove();
+      els.delete(key);
+    }
   }, []);
 
   const attachAtlasLayers = useCallback(
@@ -485,6 +530,9 @@ export default function GlobeMap({
       rotating = false;
       cancelAnimationFrame(raf);
       loadedRef.current = false;
+      for (const el of overlayElsRef.current.values()) el.remove();
+      overlayElsRef.current.clear();
+      stickyCountryKeysRef.current = [];
       map.remove();
       mapRef.current = null;
     };
@@ -566,23 +614,10 @@ export default function GlobeMap({
     map.flyTo({ center: focus.center, zoom: focus.zoom ?? 5.2, duration: 2200, essential: true });
   }, [focus]);
 
-  const overlayClass = (kind: OverlayKind) => {
-    if (kind === 'cluster') return 'map-cluster-count';
-    if (kind === 'country') return 'map-country-label';
-    if (kind === 'city') return 'map-city-label';
-    return 'map-point-label';
-  };
-
   return (
     <div className={`map-root ${legendsMode ? 'map-root-legends' : ''}`}>
       <div className="map-container" ref={containerRef} />
-      <div className="map-overlay">
-        {overlays.map((o) => (
-          <span key={o.key} className={overlayClass(o.kind)} style={{ left: o.x, top: o.y }}>
-            {o.text}
-          </span>
-        ))}
-      </div>
+      <div className="map-overlay" ref={overlayRootRef} />
       <div className="map-compass" aria-hidden="true">
         <svg viewBox="0 0 64 64" className="map-compass-svg">
           <circle cx="32" cy="32" r="30" className="map-compass-ring" />

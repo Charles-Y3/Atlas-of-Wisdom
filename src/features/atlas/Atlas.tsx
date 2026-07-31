@@ -25,7 +25,7 @@ export default function Atlas() {
   const questId = params.get('quest');
   const questCandidate = questId ? QUEST_BY_ID[questId] : undefined;
   const quest =
-    questCandidate && isQuestUnlocked(questCandidate.id, progress.completedQuests)
+    questCandidate && isQuestUnlocked(questCandidate.id, progress.completedQuests, progress.xp)
       ? questCandidate
       : undefined;
 

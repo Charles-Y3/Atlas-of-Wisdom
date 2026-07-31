@@ -4,20 +4,19 @@ import { useT } from '../../i18n/useT';
 import { VIRTUES, type VirtueId } from '../../data/virtues';
 import { LOCATION_BY_ID } from '../../data/locations';
 import { useProgress } from '../../state/store';
+import { useSettings } from '../../state/settingsStore';
 import ScrollHintRow from '../../components/ScrollHintRow';
 
-const TRUNCATE = 120;
-
-export default function ReflectionsJournal() {
+export default function PracticesJournal() {
   const { t, L } = useT();
-  const reflections = useProgress((s) => s.reflections);
+  const practices = useProgress((s) => s.practices);
+  const younger = useSettings((s) => s.youngerExplorer);
   const [filter, setFilter] = useState<VirtueId | 'all'>('all');
-  const [expanded, setExpanded] = useState<string | null>(null);
 
   const entries = useMemo(() => {
-    const rows = Object.entries(reflections ?? {}).map(([locId, r]) => ({
+    const rows = Object.entries(practices ?? {}).map(([locId, p]) => ({
       locId,
-      ...r,
+      ...p,
       nameEn: LOCATION_BY_ID[locId]?.name.en ?? locId,
     }));
     rows.sort((a, b) => {
@@ -26,13 +25,13 @@ export default function ReflectionsJournal() {
     });
     if (filter === 'all') return rows;
     return rows.filter((r) => r.virtue === filter);
-  }, [reflections, filter]);
+  }, [practices, filter]);
 
   return (
     <div className="section" style={{ marginTop: 0 }}>
-      <h2>🪞 {t('journalTitle')}</h2>
-      {Object.keys(reflections ?? {}).length === 0 ? (
-        <p className="page-subtitle">{t('journalEmpty')}</p>
+      <h2>🌱 {t('practiceJournalTitle')}</h2>
+      {Object.keys(practices ?? {}).length === 0 ? (
+        <p className="page-subtitle">{t('practiceJournalEmpty')}</p>
       ) : (
         <>
           <div style={{ marginBottom: 10 }}>
@@ -60,9 +59,6 @@ export default function ReflectionsJournal() {
             {entries.map((e) => {
               const loc = LOCATION_BY_ID[e.locId];
               const virtue = VIRTUES.find((v) => v.id === e.virtue);
-              const open = expanded === e.locId;
-              const long = e.text.length > TRUNCATE;
-              const shown = open || !long ? e.text : `${e.text.slice(0, TRUNCATE).trim()}…`;
               return (
                 <div key={e.locId} className="journal-row">
                   <div className="journal-meta">
@@ -74,21 +70,16 @@ export default function ReflectionsJournal() {
                     </span>
                     <span className="journal-day">{e.day}</span>
                   </div>
-                  <p className="journal-text">{shown}</p>
-                  {long && (
-                    <button
-                      type="button"
-                      className="btn subtle journal-toggle"
-                      onClick={() => setExpanded(open ? null : e.locId)}
-                    >
-                      {open ? t('journalCollapse') : t('journalExpand')}
-                    </button>
+                  {virtue && (
+                    <p className="journal-text">
+                      {L(younger ? virtue.practiceYoung : virtue.practice)}
+                    </p>
                   )}
                 </div>
               );
             })}
             {entries.length === 0 && (
-              <p className="page-subtitle">{t('journalEmpty')}</p>
+              <p className="page-subtitle">{t('practiceJournalEmpty')}</p>
             )}
           </div>
         </>

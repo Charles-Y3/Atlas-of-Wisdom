@@ -137,6 +137,30 @@ export const RANKS: Rank[] = [
 export const MASTER_EXPLORER_MIN_XP =
   RANKS.find((r) => r.id === 'master-explorer')?.minXp ?? 6000;
 
+/** Secondary features gated by explorer rank (core explore/read stays free). */
+export const RANK_FEATURE = {
+  passportExport: 'explorer',
+  onThisDay: 'traveller',
+  intermediateQuests: 'historian',
+  teachingOfDay: 'scholar',
+  advancedQuests: 'researcher',
+  cartographerPassport: 'wisdom-cartographer',
+} as const;
+
+export type RankFeature = keyof typeof RANK_FEATURE;
+
+/** UiKey names for per-rank unlock blurbs (defined in strings.ts). */
+export const RANK_UNLOCK_KEY: Record<string, string> = {
+  seeker: 'rankUnlockSeeker',
+  explorer: 'rankUnlockExplorer',
+  traveller: 'rankUnlockTraveller',
+  historian: 'rankUnlockHistorian',
+  scholar: 'rankUnlockScholar',
+  researcher: 'rankUnlockResearcher',
+  'master-explorer': 'rankUnlockMasterExplorer',
+  'wisdom-cartographer': 'rankUnlockCartographer',
+};
+
 export function rankIndexForXp(xp: number): number {
   let idx = 0;
   for (let i = 0; i < RANKS.length; i++) {
@@ -152,4 +176,13 @@ export function rankForXp(xp: number): Rank {
 export function nextRankForXp(xp: number): Rank | null {
   const idx = rankIndexForXp(xp);
   return idx + 1 < RANKS.length ? RANKS[idx + 1] : null;
+}
+
+export function rankMeets(xp: number, rankId: string): boolean {
+  const r = RANKS.find((x) => x.id === rankId);
+  return r ? xp >= r.minXp : false;
+}
+
+export function xpUnlocks(xp: number, feature: RankFeature): boolean {
+  return rankMeets(xp, RANK_FEATURE[feature]);
 }

@@ -103,6 +103,31 @@ export const UI = {
   rankLadderCurrent: localized('Current', '当前'),
   rankLadderNeed: localized('{n} XP to reach', '还需 {n} 经验到达'),
   rankLadderTap: localized('Tap a rank to learn more', '点按等级查看简介'),
+  rankLadderUnlocks: localized('Unlocks', '解锁'),
+  rankUnlockSeeker: localized('The core atlas — explore, seal, and read.', '核心地图集 — 探索、盖印与阅读。'),
+  rankUnlockExplorer: localized('Export your explorer passport.', '导出探索者护照。'),
+  rankUnlockTraveller: localized('On This Day — a date from the atlas each visit.', '历史上的今天 — 每次造访一则地图集中的日期。'),
+  rankUnlockHistorian: localized(
+    'Intermediate quests (or finish every beginner quest).',
+    '中级旅程（或完成全部入门旅程）。',
+  ),
+  rankUnlockScholar: localized('Teaching of the Day on the home path.', '主页上的今日教诲。'),
+  rankUnlockResearcher: localized(
+    'Advanced quests (or finish every intermediate quest).',
+    '高级旅程（或完成全部中级旅程）。',
+  ),
+  rankUnlockMasterExplorer: localized(
+    'Legends layer — also unlocks after 12 stories read.',
+    '传说层 — 读完 12 则故事亦可解锁。',
+  ),
+  rankUnlockCartographer: localized(
+    'Cartographer passport frame and a lasting mark on your profile.',
+    '制图师护照边框，以及档案上的持久印记。',
+  ),
+  rankPassportLocked: localized(
+    'Reach Explorer rank to export your passport.',
+    '达到探索者等级后即可导出护照。',
+  ),
   scrollMoreHint: localized('Swipe or drag for more', '滑动或拖动查看更多'),
 
   // ── Atlas ──────────────────────────────────────────────────────────
@@ -198,8 +223,8 @@ export const UI = {
 
   practiceTitle: localized('A small practice', '一点小小的练习'),
   practiceIntro: localized(
-    'Optional. Accept a tiny practice for this place — it also counts on your Virtue Compass.',
-    '可选。接受此地的一点小练习 — 同样会记入你的德行罗盘。',
+    'Optional. Accept a tiny practice for this place — it also counts on your Virtue Compass. No one checks; it is only a nudge.',
+    '可选。接受此地的一点小练习 — 同样会记入你的德行罗盘。无人检查；只是一点轻推。',
   ),
   practiceAccept: localized('I will try this', '我愿意试试'),
   practiceDone: localized('Practice noted', '练习已记下'),
@@ -236,15 +261,15 @@ export const UI = {
   // ── Quests ─────────────────────────────────────────────────────────
   questsTitle: localized('Quests', '旅程'),
   questsSubtitle: localized(
-    'Begin with clear beginner journeys. Finish a tier to unlock the next. Name each place from its clue — visiting a pin alone does not count. Trails appear only after correct answers.',
-    '先从线索清楚的入门旅程开始。完成一层才能解锁下一层。凭线索点出地名——仅到访不算。路线只在答对后出现。',
+    'Begin with clear beginner journeys. Finish a tier — or rise in rank — to unlock the next. Name each place from its clue — visiting a pin alone does not count. Trails appear only after correct answers.',
+    '先从线索清楚的入门旅程开始。完成一层，或提升等级，即可解锁下一层。凭线索点出地名——仅到访不算。路线只在答对后出现。',
   ),
   questTierBeginner: localized('Beginner', '入门'),
   questTierIntermediate: localized('Intermediate', '进阶'),
   questTierAdvanced: localized('Advanced', '高阶'),
   questTierLocked: localized(
-    'Complete every {tier} quest to unlock this tier.',
-    '完成全部{tier}旅程后，即可解锁本层。',
+    'Complete every {tier} quest — or reach the matching explorer rank — to unlock this tier.',
+    '完成全部{tier}旅程，或达到对应探索者等级，即可解锁本层。',
   ),
   questProgress: localized('found', '已找到'),
   questComplete: localized('A pilgrimage complete', '一段朝圣之路完成了'),
@@ -273,6 +298,7 @@ export const UI = {
     'Answer two clues correctly to unlock the trail. Visiting places does not count.',
     '答对两条线索后解锁路线。仅到访地点不算。',
   ),
+  questTrailDistanceKm: localized('{n} km', '{n} 公里'),
   questKindPilgrimage: localized('Pilgrimage', '朝圣'),
   questKindLearning: localized('Learning', '求学'),
   questKindMountain: localized('Mountains', '山岳'),
@@ -333,6 +359,17 @@ export const UI = {
   journalAllVirtues: localized('All', '全部'),
   journalExpand: localized('Show more', '展开'),
   journalCollapse: localized('Show less', '收起'),
+  practiceJournalTitle: localized('My Practices', '我的练习'),
+  practiceJournalEmpty: localized(
+    'Accept a small practice after a story — it is noted here, private and local.',
+    '读完故事后接受一点小练习 — 会记在这里，仅存于本机、仅你可见。',
+  ),
+  journeyTabReflections: localized('Reflections', '反思'),
+  journeyTabPractice: localized('Practice', '练习'),
+  journeyDisclaimer: localized(
+    'Stories in this atlas are educational retellings for exploration — not verified history, travel advice, or religious instruction. Your reflections and practices stay on this device; nothing is uploaded.',
+    '此地地图集中的故事是供探索的教育性叙述 — 并非已核实的历史、旅行建议或宗教指导。你的反思与练习只保存在本设备上，不会上传。',
+  ),
   reflectReopen: localized('Take a moment', '停一停'),
   profileTabOverview: localized('Overview', '概览'),
   profileTabJourney: localized('Journey', '旅途'),

@@ -1,4 +1,5 @@
 import { localized, type Localized } from '../i18n/types';
+import { rankMeets, RANK_FEATURE } from '../engine/progression';
 
 /**
  * Hint-driven pilgrimages: each stop shows a clue only — never the place
@@ -599,29 +600,40 @@ export const QUESTS_BY_TIER: Record<QuestTier, QuestDef[]> = {
   advanced: QUESTS.filter((q) => q.tier === 'advanced'),
 };
 
-/** Whether a tier’s journeys may be played. */
+/** Whether a tier’s journeys may be played (completion path or rank path). */
 export function questTierUnlocked(
   tier: QuestTier,
   completedQuestIds: readonly string[] | undefined,
+  xp = 0,
 ): boolean {
   const done = new Set(completedQuestIds ?? []);
   if (tier === 'beginner') return true;
   if (tier === 'intermediate') {
-    return QUESTS_BY_TIER.beginner.every((q) => done.has(q.id));
+    return (
+      QUESTS_BY_TIER.beginner.every((q) => done.has(q.id)) ||
+      rankMeets(xp, RANK_FEATURE.intermediateQuests)
+    );
   }
-  return QUESTS_BY_TIER.intermediate.every((q) => done.has(q.id));
+  return (
+    QUESTS_BY_TIER.intermediate.every((q) => done.has(q.id)) ||
+    rankMeets(xp, RANK_FEATURE.advancedQuests)
+  );
 }
 
 export function isQuestUnlocked(
   questId: string,
   completedQuestIds: readonly string[] | undefined,
+  xp = 0,
 ): boolean {
   const q = QUEST_BY_ID[questId];
   if (!q) return false;
-  return questTierUnlocked(q.tier, completedQuestIds);
+  return questTierUnlocked(q.tier, completedQuestIds, xp);
 }
 
 /** Quests the explorer may play — for Quest of the Month etc. */
-export function unlockedQuests(completedQuestIds: readonly string[] | undefined): QuestDef[] {
-  return QUESTS.filter((q) => questTierUnlocked(q.tier, completedQuestIds));
+export function unlockedQuests(
+  completedQuestIds: readonly string[] | undefined,
+  xp = 0,
+): QuestDef[] {
+  return QUESTS.filter((q) => questTierUnlocked(q.tier, completedQuestIds, xp));
 }

@@ -3,7 +3,7 @@ import { LOCATIONS } from '../../data/locations';
 import { VIRTUES } from '../../data/virtues';
 import type { Localized, Locale } from '../../i18n/types';
 import { L } from '../../i18n/L';
-import { rankForXp } from '../../engine/progression';
+import { rankForXp, xpUnlocks } from '../../engine/progression';
 import { virtueCounts } from '../../state/store';
 import type { Reflection, VirtuePractice } from '../../state/store';
 import { capturePassportGlobe } from './capturePassportGlobe';
@@ -49,6 +49,7 @@ export async function exportPassportPng(
   appName: string,
 ): Promise<void> {
   const rank = rankForXp(progress.xp);
+  const cartographer = xpUnlocks(progress.xp, 'cartographerPassport');
   const counts = virtueCounts(progress.reflections, progress.practices);
   const topCollectionId = progress.completedCollections[progress.completedCollections.length - 1];
   const topCollection = COLLECTIONS.find((c) => c.id === topCollectionId);
@@ -78,11 +79,37 @@ export async function exportPassportPng(
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
-  ctx.strokeStyle = '#b08a3c';
-  ctx.lineWidth = 6;
-  ctx.strokeRect(24, 24, W - 48, H - 48);
-  ctx.lineWidth = 1.5;
-  ctx.strokeRect(36, 36, W - 72, H - 72);
+  if (cartographer) {
+    ctx.strokeStyle = '#6b4f2a';
+    ctx.lineWidth = 14;
+    ctx.strokeRect(18, 18, W - 36, H - 36);
+    ctx.strokeStyle = '#b08a3c';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(32, 32, W - 64, H - 64);
+    ctx.strokeStyle = '#8a6a2a';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(44, 44, W - 88, H - 88);
+    // Corner flourishes
+    const mark = (x: number, y: number, sx: number, sy: number) => {
+      ctx.beginPath();
+      ctx.moveTo(x, y + 28 * sy);
+      ctx.lineTo(x, y);
+      ctx.lineTo(x + 28 * sx, y);
+      ctx.strokeStyle = '#8a6a2a';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    };
+    mark(48, 48, 1, 1);
+    mark(W - 48, 48, -1, 1);
+    mark(48, H - 48, 1, -1);
+    mark(W - 48, H - 48, -1, -1);
+  } else {
+    ctx.strokeStyle = '#b08a3c';
+    ctx.lineWidth = 6;
+    ctx.strokeRect(24, 24, W - 48, H - 48);
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(36, 36, W - 72, H - 72);
+  }
 
   ctx.fillStyle = '#2b2416';
   ctx.textAlign = 'center';
