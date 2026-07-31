@@ -6,7 +6,7 @@ import { LOCATIONS, LOCATION_BY_ID } from '../../data/locations';
 import { PEOPLE } from '../../data/people';
 import { CATEGORY_BY_ID, TRADITION_BY_ID } from '../../data/categories';
 import { LOCATION_TEACHINGS } from '../../data/teachings';
-import { QUESTS } from '../../data/quests';
+import { unlockedQuests } from '../../data/quests';
 import { formatYear } from '../../data/types';
 import { monthKey, onThisDayPick, pickIndex, todayKey } from '../../engine/daily';
 import { useProgress, statsOf } from '../../state/store';
@@ -23,6 +23,7 @@ export default function Home() {
   const progress = useProgress();
   const stats = statsOf(progress);
   const rank = rankForXp(progress.xp);
+  const completedQuests = progress.completedQuests;
 
   const daily = useMemo(() => {
     const idx = pickIndex(`discovery:${todayKey()}`, LOCATIONS.length);
@@ -49,9 +50,11 @@ export default function Home() {
   }, []);
 
   const questOfMonth = useMemo(() => {
-    const idx = pickIndex(`questMonth:${monthKey()}`, QUESTS.length);
-    return QUESTS[idx];
-  }, []);
+    const pool = unlockedQuests(completedQuests);
+    if (pool.length === 0) return null;
+    const idx = pickIndex(`questMonth:${monthKey()}`, pool.length);
+    return pool[idx];
+  }, [completedQuests]);
 
   const greeting =
     stats.placesExplored === 0

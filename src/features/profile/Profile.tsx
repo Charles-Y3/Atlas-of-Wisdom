@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useT } from '../../i18n/useT';
 import { useLocale } from '../../state/localeStore';
 import { useSettings } from '../../state/settingsStore';
@@ -6,6 +6,13 @@ import { VISIBLE_LOCALES, LOCALE_LABELS } from '../../i18n/types';
 import { ACHIEVEMENTS } from '../../data/achievements';
 import { rankForXp, nextRankForXp } from '../../engine/progression';
 import { useProgress, statsOf } from '../../state/store';
+import {
+  getDeferredInstallPrompt,
+  installGuideKind,
+  isStandaloneDisplay,
+  promptPwaInstall,
+  subscribePwaInstall,
+} from '../../pwa/pwaInstall';
 import VirtueCompass from './VirtueCompass';
 import StreakRitual from './StreakRitual';
 import ReflectionsJournal from './ReflectionsJournal';
@@ -30,13 +37,38 @@ export default function Profile() {
   const [tab, setTab] = useState<Tab>('overview');
   const [rankOpen, setRankOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [canInstall, setCanInstall] = useState(() => getDeferredInstallPrompt() !== null);
+  const [installed, setInstalled] = useState(() =>
+    typeof window !== 'undefined' ? isStandaloneDisplay() : false,
+  );
+
+  useEffect(() => {
+    return subscribePwaInstall(() => {
+      setCanInstall(getDeferredInstallPrompt() !== null);
+      setInstalled(isStandaloneDisplay());
+    });
+  }, []);
 
   const pct = next
     ? Math.min(100, Math.round(((progress.xp - rank.minXp) / (next.minXp - rank.minXp)) * 100))
     : 100;
 
+  const installGuideKey =
+    installGuideKind() === 'ios'
+      ? 'installGuideIos'
+      : installGuideKind() === 'android'
+        ? 'installGuideAndroid'
+        : 'installGuideDesktop';
+
   function reset() {
     if (window.confirm(t('profileResetConfirm'))) progress.reset();
+  }
+
+  async function handleInstall() {
+    if (installed) return;
+    const outcome = await promptPwaInstall();
+    if (outcome === 'accepted') setInstalled(true);
+    setCanInstall(getDeferredInstallPrompt() !== null);
   }
 
   const tabs: { id: Tab; label: string }[] = [
@@ -207,6 +239,22 @@ export default function Profile() {
             <p className="page-subtitle" style={{ marginTop: 6 }}>
               {t('settingsSoundHint')}
             </p>
+          </div>
+
+          <div className="section">
+            <h2>{t('installTitle')}</h2>
+            {installed ? (
+              <p className="page-subtitle">{t('installDone')}</p>
+            ) : (
+              <>
+                <p className="page-subtitle">{t(installGuideKey)}</p>
+                {canInstall && (
+                  <button type="button" className="btn secondary" onClick={() => void handleInstall()}>
+                    ⬇️ {t('installButton')}
+                  </button>
+                )}
+              </>
+            )}
           </div>
 
           <div className="section">

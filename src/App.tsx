@@ -1,7 +1,9 @@
 import { HashRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import { useLocale } from './state/localeStore';
+import { useSettings } from './state/settingsStore';
 import { useT } from './i18n/useT';
 import LanguageGate from './features/onboarding/LanguageGate';
+import PreferencesGate from './features/onboarding/PreferencesGate';
 import Home from './features/home/Home';
 import Atlas from './features/atlas/Atlas';
 import LocationPage from './features/location/LocationPage';
@@ -11,6 +13,7 @@ import Quests from './features/quests/Quests';
 import Collection from './features/collection/Collection';
 import Profile from './features/profile/Profile';
 import Toasts from './components/Toasts';
+import UpdateBanner from './components/UpdateBanner';
 
 function Shell() {
   const { t } = useT();
@@ -28,6 +31,7 @@ function Shell() {
 
   return (
     <div className="app">
+      <UpdateBanner />
       <main className={`app-main ${isMapPage ? 'no-scroll' : ''}`}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -61,5 +65,10 @@ function Shell() {
 
 export default function App() {
   const hasChosen = useLocale((s) => s.hasChosen);
-  return <HashRouter>{hasChosen ? <Shell /> : <LanguageGate />}</HashRouter>;
+  const prefsChosen = useSettings((s) => s.prefsChosen);
+  return (
+    <HashRouter>
+      {!hasChosen ? <LanguageGate /> : !prefsChosen ? <PreferencesGate /> : <Shell />}
+    </HashRouter>
+  );
 }

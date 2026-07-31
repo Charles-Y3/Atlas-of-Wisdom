@@ -1,7 +1,14 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useT } from '../../i18n/useT';
-import { QUESTS, type QuestKind } from '../../data/quests';
+import {
+  QUEST_TIERS,
+  QUESTS_BY_TIER,
+  questTierUnlocked,
+  type QuestDef,
+  type QuestKind,
+  type QuestTier,
+} from '../../data/quests';
 import { LOCATIONS, LOCATION_BY_ID } from '../../data/locations';
 import { CATEGORY_BY_ID } from '../../data/categories';
 import { useProgress } from '../../state/store';
@@ -14,6 +21,21 @@ const KIND_LABEL: Record<QuestKind, UiKey> = {
   mountain: 'questKindMountain',
   route: 'questKindRoute',
   devotion: 'questKindDevotion',
+  legend: 'questKindLegend',
+  epoch: 'questKindEpoch',
+  ocean: 'questKindOcean',
+};
+
+const TIER_LABEL: Record<QuestTier, UiKey> = {
+  beginner: 'questTierBeginner',
+  intermediate: 'questTierIntermediate',
+  advanced: 'questTierAdvanced',
+};
+
+const PREV_TIER: Record<QuestTier, QuestTier | null> = {
+  beginner: null,
+  intermediate: 'beginner',
+  advanced: 'intermediate',
 };
 
 function QuestGuessForm({
@@ -104,9 +126,113 @@ function QuestGuessForm({
   );
 }
 
-export default function Quests() {
+function QuestCard({
+  q,
+  expanded,
+  onToggle,
+}: {
+  q: QuestDef;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
   const { t, L } = useT();
   const questProgress = useProgress((s) => s.questProgress);
+  const completedQuests = useProgress((s) => s.completedQuests);
+  const done = new Set(questProgress?.[q.id]?.completedSteps ?? []);
+  const found = q.steps.filter((s) => done.has(s.id)).length;
+  const total = q.steps.length;
+  const isComplete = completedQuests?.includes(q.id) || found === total;
+
+  return (
+    <div className={`card quest-card ${isComplete ? 'quest-done' : ''}`}>
+      <button
+        type="button"
+        className="quest-toggle"
+        onClick={onToggle}
+        aria-expanded={expanded}
+      >
+        <div className="quest-head">
+          <span className="quest-emoji">{q.emoji}</span>
+          <div className="quest-head-text">
+            <div className="quest-name">
+              {L(q.name)}{' '}
+              <span className="tag">{t(KIND_LABEL[q.kind])}</span>
+              {isComplete && <span className="tag gold">✓ {t('questComplete')}</span>}
+            </div>
+            <p className="quest-blurb">{L(q.blurb)}</p>
+          </div>
+        </div>
+        <div className="progress">
+          <div style={{ width: `${total ? (found / total) * 100 : 0}%` }} />
+        </div>
+        <div className="progress-label">
+          {found} / {total} {t('questProgress')}
+        </div>
+        {!isComplete && (
+          <p className="nudge-line">
+            {t('questNudge').replace('{n}', String(total - found))}
+          </p>
+        )}
+      </button>
+
+      {expanded && (
+        <div className="quest-expanded">
+          <div className="quest-trail-block" onClick={(e) => e.stopPropagation()}>
+            <div className="quest-trail-label">{t('questTrailPreview')}</div>
+            {found >= 2 ? (
+              <>
+                <p className="quest-trail-hint">{t('questTrailHint')}</p>
+                <QuestTrailPreview steps={q.steps} foundIds={done} />
+                <Link className="btn secondary quest-show-trail" to={`/atlas?quest=${q.id}`}>
+                  🗺️ {t('questShowTrail')}
+                </Link>
+              </>
+            ) : (
+              <p className="quest-trail-hint">{t('questTrailLocked')}</p>
+            )}
+          </div>
+          <ol className="quest-steps">
+            {q.steps.map((step, i) => {
+              const foundStep = done.has(step.id);
+              const loc = LOCATION_BY_ID[step.id];
+              return (
+                <li key={step.id} className={foundStep ? 'found' : 'hidden-step'}>
+                  <div className="quest-step-row">
+                    <span className="quest-step-mark">{foundStep ? '✓' : '?'}</span>
+                    <div className="quest-step-body">
+                      {foundStep && loc ? (
+                        <>
+                          <div className="quest-step-name">
+                            {CATEGORY_BY_ID[loc.category].emoji} {L(loc.name)}
+                          </div>
+                          <p className="quest-hint">{L(step.hint)}</p>
+                          <Link className="btn subtle quest-open-found" to={`/location/${step.id}`}>
+                            {t('atlasOpenLocation')} →
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          <div className="quest-step-name">
+                            {t('questClue')} {i + 1}
+                          </div>
+                          <p className="quest-hint">{L(step.hint)}</p>
+                          <QuestGuessForm questId={q.id} correctId={step.id} />
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function Quests() {
+  const { t } = useT();
   const completedQuests = useProgress((s) => s.completedQuests);
   const [openId, setOpenId] = useState<string | null>(null);
 
@@ -115,102 +241,52 @@ export default function Quests() {
       <h1 className="page-title">🛤️ {t('questsTitle')}</h1>
       <p className="page-subtitle">{t('questsSubtitle')}</p>
 
-      <div className="quest-list">
-        {QUESTS.map((q) => {
-          const done = new Set(questProgress?.[q.id]?.completedSteps ?? []);
-          const found = q.steps.filter((s) => done.has(s.id)).length;
-          const total = q.steps.length;
-          const isComplete = completedQuests?.includes(q.id) || found === total;
-          const expanded = openId === q.id;
-
-          return (
-            <div key={q.id} className={`card quest-card ${isComplete ? 'quest-done' : ''}`}>
-              <button
-                type="button"
-                className="quest-toggle"
-                onClick={() => setOpenId(expanded ? null : q.id)}
-                aria-expanded={expanded}
-              >
-                <div className="quest-head">
-                  <span className="quest-emoji">{q.emoji}</span>
-                  <div className="quest-head-text">
-                    <div className="quest-name">
-                      {L(q.name)}{' '}
-                      <span className="tag">{t(KIND_LABEL[q.kind])}</span>
-                      {isComplete && <span className="tag gold">✓ {t('questComplete')}</span>}
-                    </div>
-                    <p className="quest-blurb">{L(q.blurb)}</p>
-                  </div>
-                </div>
-                <div className="progress">
-                  <div style={{ width: `${total ? (found / total) * 100 : 0}%` }} />
-                </div>
-                <div className="progress-label">
-                  {found} / {total} {t('questProgress')}
-                </div>
-                {!isComplete && (
-                  <p className="nudge-line">
-                    {t('questNudge').replace('{n}', String(total - found))}
-                  </p>
-                )}
-              </button>
-
-              {expanded && (
-                <div className="quest-expanded">
-                  <div className="quest-trail-block" onClick={(e) => e.stopPropagation()}>
-                    <div className="quest-trail-label">{t('questTrailPreview')}</div>
-                    {found >= 2 ? (
-                      <>
-                        <p className="quest-trail-hint">{t('questTrailHint')}</p>
-                        <QuestTrailPreview steps={q.steps} foundIds={done} />
-                        <Link className="btn secondary quest-show-trail" to={`/atlas?quest=${q.id}`}>
-                          🗺️ {t('questShowTrail')}
-                        </Link>
-                      </>
-                    ) : (
-                      <p className="quest-trail-hint">{t('questTrailLocked')}</p>
-                    )}
-                  </div>
-                  <ol className="quest-steps">
-                    {q.steps.map((step, i) => {
-                      const foundStep = done.has(step.id);
-                      const loc = LOCATION_BY_ID[step.id];
-                      return (
-                        <li key={step.id} className={foundStep ? 'found' : 'hidden-step'}>
-                          <div className="quest-step-row">
-                            <span className="quest-step-mark">{foundStep ? '✓' : '?'}</span>
-                            <div className="quest-step-body">
-                              {foundStep && loc ? (
-                                <>
-                                  <div className="quest-step-name">
-                                    {CATEGORY_BY_ID[loc.category].emoji} {L(loc.name)}
-                                  </div>
-                                  <p className="quest-hint">{L(step.hint)}</p>
-                                  <Link className="btn subtle quest-open-found" to={`/location/${step.id}`}>
-                                    {t('atlasOpenLocation')} →
-                                  </Link>
-                                </>
-                              ) : (
-                                <>
-                                  <div className="quest-step-name">
-                                    {t('questClue')} {i + 1}
-                                  </div>
-                                  <p className="quest-hint">{L(step.hint)}</p>
-                                  <QuestGuessForm questId={q.id} correctId={step.id} />
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ol>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {QUEST_TIERS.map((tier) => {
+        const unlocked = questTierUnlocked(tier, completedQuests);
+        const list = QUESTS_BY_TIER[tier];
+        const prev = PREV_TIER[tier];
+        return (
+          <section key={tier} className="quest-tier-section">
+            <h2 className="quest-tier-heading">
+              {t(TIER_LABEL[tier])}
+              {!unlocked && <span className="tag">🔒</span>}
+            </h2>
+            {!unlocked ? (
+              <div className="card quest-tier-locked">
+                <p>
+                  {t('questTierLocked').replace(
+                    '{tier}',
+                    prev ? t(TIER_LABEL[prev]) : t(TIER_LABEL.beginner),
+                  )}
+                </p>
+                <ul className="quest-tier-locked-names">
+                  {list.map((q) => (
+                    <li key={q.id}>
+                      <span aria-hidden>{q.emoji}</span> <LockedQuestName quest={q} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div className="quest-list">
+                {list.map((q) => (
+                  <QuestCard
+                    key={q.id}
+                    q={q}
+                    expanded={openId === q.id}
+                    onToggle={() => setOpenId(openId === q.id ? null : q.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        );
+      })}
     </div>
   );
+}
+
+function LockedQuestName({ quest }: { quest: QuestDef }) {
+  const { L } = useT();
+  return <span>{L(quest.name)}</span>;
 }

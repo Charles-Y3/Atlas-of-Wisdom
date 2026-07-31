@@ -1,11 +1,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { XP_FOR, rankIndexForXp, RANKS, STREAK_XP_MILESTONES } from '../engine/progression';
+import {
+  XP_FOR,
+  rankIndexForXp,
+  RANKS,
+  STREAK_XP_MILESTONES,
+  MASTER_EXPLORER_MIN_XP,
+} from '../engine/progression';
 import { todayKey, yesterdayKey } from '../engine/daily';
 import { LOCATIONS, LOCATION_BY_ID } from '../data/locations';
 import { COLLECTIONS } from '../data/collections';
 import { ACHIEVEMENTS } from '../data/achievements';
-import { QUESTS } from '../data/quests';
+import { QUESTS, QUESTS_BY_TIER, isQuestUnlocked } from '../data/quests';
 import type { ExplorationStats } from '../data/types';
 import type { VirtueId } from '../data/virtues';
 import { useToasts } from './toastStore';
@@ -117,6 +123,8 @@ export function statsOf(
     | 'discoveriesMade'
     | 'quizzesCompleted'
     | 'exploredLegends'
+    | 'completedQuests'
+    | 'questProgress'
   >,
 ): ExplorationStats {
   const visitedIds = Object.keys(s.visited);
@@ -126,6 +134,13 @@ export function statsOf(
   const virtues = new Set(
     [...lived].flatMap((id) => LOCATION_BY_ID[id]?.virtues ?? []),
   );
+  const completedQuests = s.completedQuests ?? [];
+  const completedSet = new Set(completedQuests);
+  const questProgress = s.questProgress ?? {};
+  let questStepsCompleted = 0;
+  for (const prog of Object.values(questProgress)) {
+    questStepsCompleted += prog.completedSteps?.length ?? 0;
+  }
   return {
     placesExplored: visitedIds.length,
     storiesRead: readIds.length,
@@ -137,6 +152,9 @@ export function statsOf(
     reflectionsWritten: Object.keys(s.reflections ?? {}).length,
     virtuesTouched: virtues.size,
     legendsExplored: Object.keys(s.exploredLegends ?? {}).length,
+    questsCompleted: completedQuests.length,
+    questStepsCompleted,
+    beginnerQuestsCompleted: QUESTS_BY_TIER.beginner.filter((q) => completedSet.has(q.id)).length,
   };
 }
 
@@ -441,6 +459,7 @@ export const useProgress = create<AtlasProgress>()(
 
         completeQuestStep: (questId, locationId) => {
           const s = get();
+          if (!isQuestUnlocked(questId, s.completedQuests)) return;
           const next = snapshot(s);
           if (!awardQuestStep(next, questId, locationId)) return;
           // Naming a place also seals arrival.
@@ -475,7 +494,11 @@ export const useProgress = create<AtlasProgress>()(
   ),
 );
 
-/** Legends layer unlock: twelve stories read, or Master Explorer XP. */
+/** Legends layer unlock: twelve stories read, Master Explorer XP, or achievement. */
 export function legendsUnlocked(s: Pick<AtlasProgress, 'read' | 'xp' | 'achievements'>): boolean {
-  return Object.keys(s.read).length >= 12 || s.xp >= 3200 || s.achievements.includes('beyond-the-map');
+  return (
+    Object.keys(s.read).length >= 12 ||
+    s.xp >= MASTER_EXPLORER_MIN_XP ||
+    s.achievements.includes('beyond-the-map')
+  );
 }

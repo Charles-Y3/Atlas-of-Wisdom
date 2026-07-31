@@ -11,6 +11,9 @@ interface SettingsState {
   /** Soft chime on rank-up / achievement toasts. Default off. */
   soundEnabled: boolean;
   setSoundEnabled: (value: boolean) => void;
+  /** First-run preferences gate completed (after language). */
+  prefsChosen: boolean;
+  completePrefs: () => void;
 }
 
 // Persisted separately from exploration progress so "Reset progress" never
@@ -24,7 +27,20 @@ export const useSettings = create<SettingsState>()(
       setYoungerExplorer: (youngerExplorer) => set({ youngerExplorer }),
       soundEnabled: false,
       setSoundEnabled: (soundEnabled) => set({ soundEnabled }),
+      prefsChosen: false,
+      completePrefs: () => set({ prefsChosen: true }),
     }),
-    { name: 'atlas-settings', version: 1 },
+    {
+      name: 'atlas-settings',
+      version: 2,
+      migrate: (persisted, version) => {
+        const p = (persisted ?? {}) as Record<string, unknown>;
+        // Existing installs already chose language — skip the new prefs gate.
+        if (version < 2) {
+          return { ...p, prefsChosen: true };
+        }
+        return p;
+      },
+    },
   ),
 );

@@ -128,10 +128,16 @@ export interface ExplorationStats {
   discoveriesMade: number;
   quizzesCompleted: number;
   reflectionsWritten: number;
-  /** How many distinct virtues the explorer has encountered (via reading). */
+  /** Distinct virtues from lived places (reflection and/or practice). */
   virtuesTouched: number;
   /** How many legendary places have been opened. */
   legendsExplored: number;
+  /** Quest journeys fully completed. */
+  questsCompleted: number;
+  /** Individual quest clues answered correctly. */
+  questStepsCompleted: number;
+  /** Beginner-tier quests finished (for tier achievements). */
+  beginnerQuestsCompleted: number;
 }
 
 export interface AchievementDef {

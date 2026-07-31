@@ -6,7 +6,7 @@ import { useT } from '../../i18n/useT';
 import { CATEGORIES, CATEGORY_BY_ID, TRADITION_BY_ID } from '../../data/categories';
 import { LOCATION_BY_ID } from '../../data/locations';
 import { LEGENDS, LEGEND_BY_ID } from '../../data/legends';
-import { QUEST_BY_ID } from '../../data/quests';
+import { QUEST_BY_ID, isQuestUnlocked } from '../../data/quests';
 import { useProgress, legendsUnlocked } from '../../state/store';
 import type { CategoryId } from '../../data/types';
 
@@ -23,7 +23,11 @@ export default function Atlas() {
   const unlocked = legendsUnlocked(progress);
   const legendsMode = params.get('legends') === '1' && unlocked;
   const questId = params.get('quest');
-  const quest = questId ? QUEST_BY_ID[questId] : undefined;
+  const questCandidate = questId ? QUEST_BY_ID[questId] : undefined;
+  const quest =
+    questCandidate && isQuestUnlocked(questCandidate.id, progress.completedQuests)
+      ? questCandidate
+      : undefined;
 
   const visitedIds = useMemo(() => new Set(Object.keys(visited)), [visited]);
   /** Clue answers only — sealed visits never add a trail stop. */

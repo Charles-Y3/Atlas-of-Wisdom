@@ -1,20 +1,21 @@
 import { localized } from '../i18n/types';
 import type { AchievementDef } from './types';
 import { LEGENDS } from './legends';
+import { QUESTS, QUESTS_BY_TIER } from './quests';
 
 export const ACHIEVEMENTS: AchievementDef[] = [
   {
     id: 'first-discovery',
     name: localized('First Discovery', '初次发现'),
     emoji: '📍',
-    description: localized('Explore your first place.', '探索你的第一个地点。'),
+    description: localized('Seal your first place.', '盖印你的第一个地点。'),
     check: (s) => s.placesExplored >= 1,
   },
   {
     id: 'ten-pins',
     name: localized('Ten Pins on the Map', '地图十标'),
     emoji: '🧷',
-    description: localized('Explore ten places.', '探索十个地点。'),
+    description: localized('Seal ten places.', '盖印十个地点。'),
     check: (s) => s.placesExplored >= 10,
   },
   {
@@ -98,7 +99,10 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     id: 'full-compass',
     name: localized('Full Compass', '罗盘周全'),
     emoji: '🧿',
-    description: localized('Read stories that touch all nine virtues.', '读完触及全部九种德行的故事。'),
+    description: localized(
+      'Live places that touch all nine virtues — by reflection or practice.',
+      '通过反思或练习，活出触及全部九种德行的地方。',
+    ),
     check: (s) => s.virtuesTouched >= 9,
   },
   {
@@ -107,6 +111,27 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     emoji: '💡',
     description: localized('Complete five daily quizzes.', '完成五次每日问答。'),
     check: (s) => s.quizzesCompleted >= 5,
+  },
+  {
+    id: 'first-quest',
+    name: localized('First Pilgrimage', '初次朝圣'),
+    emoji: '🥾',
+    description: localized('Complete your first quest journey.', '完成你的第一段旅程。'),
+    check: (s) => s.questsCompleted >= 1,
+  },
+  {
+    id: 'beginner-paths',
+    name: localized('Beginner Paths', '入门之路'),
+    emoji: '🌱',
+    description: localized('Complete every beginner quest.', '完成全部入门旅程。'),
+    check: (s) => s.beginnerQuestsCompleted >= QUESTS_BY_TIER.beginner.length,
+  },
+  {
+    id: 'master-of-paths',
+    name: localized('Master of Paths', '路途宗师'),
+    emoji: '🧭',
+    description: localized('Complete every quest in the atlas.', '完成地图集中的每一段旅程。'),
+    check: (s) => s.questsCompleted >= QUESTS.length,
   },
   {
     id: 'beyond-the-map',

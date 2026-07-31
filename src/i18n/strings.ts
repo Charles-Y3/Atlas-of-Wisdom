@@ -42,7 +42,32 @@ export const UI = {
   gateWelcome: localized('Welcome, explorer', '欢迎你，探索者'),
   gateSubtitle: localized('Choose your language to begin the journey.', '选择语言，开始你的旅程。'),
   gateChangeLater: localized('You can change this anytime in Explorer settings.', '之后可随时在探索者页面更改。'),
+  prefsGateTitle: localized('How will you explore?', '你将如何探索？'),
+  prefsGateSubtitle: localized(
+    'A few preferences for your journey. You can change them later.',
+    '先设定几项旅途偏好。之后仍可更改。',
+  ),
+  prefsGateContinue: localized('Begin exploring', '开始探索'),
+  prefsGateChangeLater: localized('Change anytime under Explorer → Settings.', '可随时在探索者 → 设置中更改。'),
   language: localized('Language', '语言'),
+  updateAvailable: localized('A new version of Atlas of Wisdom is ready.', '智慧地图集有新版本可用。'),
+  updateReload: localized('Reload to update', '重新加载以更新'),
+  updateLater: localized('Later', '稍后'),
+  installTitle: localized('Install the app', '安装应用'),
+  installButton: localized('Download & install', '下载并安装'),
+  installDone: localized('Installed — open from your home screen or dock.', '已安装 — 可从主屏幕或程序坞打开。'),
+  installGuideIos: localized(
+    'On iPhone or iPad: open this page in Safari, tap Share, then “Add to Home Screen”.',
+    '在 iPhone 或 iPad：用 Safari 打开本页，点“分享”，再选择“添加到主屏幕”。',
+  ),
+  installGuideAndroid: localized(
+    'On Android: open the browser menu (⋮), then tap “Install app” or “Add to Home screen”.',
+    '在 Android：打开浏览器菜单（⋮），再点“安装应用”或“添加到主屏幕”。',
+  ),
+  installGuideDesktop: localized(
+    'On a computer: open your browser menu and choose “Install app” or “Install”.',
+    '在电脑上：打开浏览器菜单，选择“安装应用”或“安装”。',
+  ),
 
   // ── Home ───────────────────────────────────────────────────────────
   homeSearchPlaceholder: localized('Search places, people, traditions…', '搜索地点、人物、传统…'),
@@ -78,7 +103,7 @@ export const UI = {
   rankLadderCurrent: localized('Current', '当前'),
   rankLadderNeed: localized('{n} XP to reach', '还需 {n} 经验到达'),
   rankLadderTap: localized('Tap a rank to learn more', '点按等级查看简介'),
-  scrollMoreHint: localized('Swipe for more', '向右滑动查看更多'),
+  scrollMoreHint: localized('Swipe or drag for more', '滑动或拖动查看更多'),
 
   // ── Atlas ──────────────────────────────────────────────────────────
   atlasTitle: localized('World Atlas', '世界地图'),
@@ -90,8 +115,8 @@ export const UI = {
   atlasOpenLocation: localized('Explore this place', '探索此地'),
   atlasLegends: localized('Legends', '传说'),
   atlasLegendsLocked: localized(
-    'Legends unlock after you read 12 stories — or reach Master Explorer.',
-    '读完12个故事，或达到宗师级探索者后，即可解锁传说层。',
+    'Legends unlock after you read 12 stories — or reach Master Explorer rank.',
+    '读完12个故事，或达到探索大师等级后，即可解锁传说层。',
   ),
   atlasLegendsHint: localized(
     'Speculative pins — stories, not verified sites. Toggle off to return to the historical atlas.',
@@ -148,8 +173,8 @@ export const UI = {
   locSealXp: localized('Place sealed!', '地点已盖印！'),
   locSealTitle: localized('Seal this place', '为此地盖印'),
   locSealIntro: localized(
-    'Answer two short questions to mark this place as visited. Wrong answers do not advance — try again.',
-    '答对两道简短题，即可将此地记为已到访。答错不会前进 — 再试一次。',
+    'Answer two short questions to mark this place as visited. Choices reshuffle after a miss; two misses bring a new question.',
+    '答对两道简短题，即可将此地记为已到访。答错会打乱选项；连续两次答错会换一道新题。',
   ),
   locSealDone: localized('Place sealed', '地点已盖印'),
   locReadBonus: localized('Read to the end — bonus XP', '读完全部 — 奖励经验'),
@@ -211,8 +236,15 @@ export const UI = {
   // ── Quests ─────────────────────────────────────────────────────────
   questsTitle: localized('Quests', '旅程'),
   questsSubtitle: localized(
-    'Read each clue, then name the place — filter by country if it helps. Visiting a pin alone does not count. Trails appear only after you answer clues correctly.',
-    '读懂每条线索，再点出地名——可按国家筛选。仅到访地点不算找到。路线只在答对线索后才会出现。',
+    'Begin with clear beginner journeys. Finish a tier to unlock the next. Name each place from its clue — visiting a pin alone does not count. Trails appear only after correct answers.',
+    '先从线索清楚的入门旅程开始。完成一层才能解锁下一层。凭线索点出地名——仅到访不算。路线只在答对后出现。',
+  ),
+  questTierBeginner: localized('Beginner', '入门'),
+  questTierIntermediate: localized('Intermediate', '进阶'),
+  questTierAdvanced: localized('Advanced', '高阶'),
+  questTierLocked: localized(
+    'Complete every {tier} quest to unlock this tier.',
+    '完成全部{tier}旅程后，即可解锁本层。',
   ),
   questProgress: localized('found', '已找到'),
   questComplete: localized('A pilgrimage complete', '一段朝圣之路完成了'),
@@ -246,6 +278,9 @@ export const UI = {
   questKindMountain: localized('Mountains', '山岳'),
   questKindRoute: localized('Route', '通道'),
   questKindDevotion: localized('Devotion', '虔敬'),
+  questKindLegend: localized('Legend', '传说'),
+  questKindEpoch: localized('Epoch', '纪元'),
+  questKindOcean: localized('Ocean', '海洋'),
 
   // ── Collections ────────────────────────────────────────────────────
   collectionTitle: localized('Collections', '收藏'),
@@ -303,12 +338,20 @@ export const UI = {
 
   // ── Daily quiz ─────────────────────────────────────────────────────
   quizTitle: localized('Daily Quiz', '每日问答'),
-  quizIntro: localized('Three questions from places you can explore.', '三道题，来自你可以探索的地方。'),
+  quizIntro: localized(
+    'Three questions from places you can explore. Misses reshuffle choices; two misses change the question.',
+    '三道题，来自你可以探索的地方。答错会打乱选项；连续两次答错会换题。',
+  ),
   quizQuestionCountry: localized('In which country is this place?', '这个地方位于哪个国家？'),
   quizQuestionTradition: localized('Which tradition is this place most associated with?', '这个地方与哪个传统联系最深？'),
   quizQuestionCategory: localized('What kind of place is this?', '这是哪一类地方？'),
   quizCorrect: localized('Correct!', '答对了！'),
   quizWrong: localized('Not quite — try again.', '不太对 — 再试一次。'),
+  quizChoicesShuffled: localized('Choices reshuffled — read carefully.', '选项已打乱 — 仔细再看。'),
+  quizQuestionChanged: localized(
+    'New question — look back at the place before guessing again.',
+    '已换新题 — 先回去读读此地，再作答。',
+  ),
   quizDone: localized('Quiz complete! Come back tomorrow.', '问答完成！明天再来。'),
   quizDoneToday: localized('Done for today', '今日已完成'),
   quizNext: localized('Next question', '下一题'),

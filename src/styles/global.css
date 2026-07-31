@@ -154,8 +154,19 @@ button {
   overflow-x: auto;
   padding: 4px 2px 8px;
   scrollbar-width: none;
+  touch-action: pan-x;
 }
 .chip-row::-webkit-scrollbar { display: none; }
+.chip-row-scrollable { cursor: grab; }
+.chip-row.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+  scroll-behavior: auto;
+}
+.chip-row.is-dragging .chip,
+.chip-row.is-dragging button {
+  pointer-events: none;
+}
 
 .scroll-hint-wrap {
   position: relative;
@@ -1094,6 +1105,33 @@ button {
 
 .quest-list { display: flex; flex-direction: column; gap: 12px; }
 
+.quest-tier-section { margin-bottom: 22px; }
+.quest-tier-heading {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-family: var(--font-display);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.quest-tier-locked {
+  opacity: 0.85;
+  background: var(--paper-deep);
+}
+.quest-tier-locked p {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+.quest-tier-locked-names {
+  margin: 0;
+  padding-left: 1.2em;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
 .quest-serendipity {
   background:
     linear-gradient(165deg, rgba(176, 138, 60, 0.08), transparent 55%),
@@ -1290,12 +1328,14 @@ button {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  text-decoration: none;
+  text-align: left;
+  font: inherit;
   color: inherit;
   background: var(--paper-deep);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 8px;
+  cursor: pointer;
   transition: border-color 0.15s ease;
 }
 .plate-card:hover { border-color: var(--gold); }
@@ -1323,6 +1363,133 @@ button {
   font-weight: 700;
   line-height: 1.3;
   color: var(--ink);
+}
+
+.plate-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(43, 36, 22, 0.82);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 16px 24px;
+  gap: 10px;
+}
+.plate-lightbox-actions {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+.plate-lightbox-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+.plate-lightbox-art {
+  all: unset;
+  cursor: zoom-out;
+  max-width: min(920px, 100%);
+  max-height: min(72vh, 720px);
+  display: block;
+}
+.plate-lightbox-art img {
+  display: block;
+  width: 100%;
+  max-height: min(72vh, 720px);
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  background: #efe4cc;
+}
+.plate-lightbox-fallback {
+  width: min(420px, 90vw);
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  background: #efe4cc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  color: var(--ink);
+  font-size: 18px;
+}
+.plate-lightbox-fallback span:first-child { font-size: 48px; }
+.plate-lightbox-caption {
+  margin: 0;
+  color: #f6f0e2;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-align: center;
+}
+
+.quiz-retry-note {
+  color: var(--gold-deep) !important;
+  margin: 0 0 8px !important;
+}
+
+.update-banner {
+  position: sticky;
+  top: 0;
+  z-index: 70;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 14px;
+  padding: 10px 14px;
+  background: #6b4f2a;
+  color: #fffdf6;
+  font-size: 13px;
+  box-shadow: 0 4px 18px rgba(43, 36, 22, 0.25);
+}
+.update-banner-body { text-align: center; line-height: 1.4; }
+.update-banner-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.update-banner .btn {
+  background: #fffdf6;
+  color: #6b4f2a;
+  border-color: #fffdf6;
+}
+.update-banner .btn.subtle {
+  background: transparent;
+  color: #fffdf6;
+  border-color: rgba(255, 253, 246, 0.45);
+}
+
+.prefs-gate-card { text-align: left; max-width: 440px; }
+.prefs-gate-card .gate-title,
+.prefs-gate-card .gate-subtitle,
+.prefs-gate-card .gate-emoji { text-align: center; }
+.prefs-gate-toggles { display: flex; flex-direction: column; gap: 4px; }
+.prefs-gate-hint {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+.prefs-gate-install {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+.prefs-gate-install-title {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-family: var(--font-display);
 }
 
 .quest-trail-hint {

@@ -9,6 +9,11 @@ import '@fontsource/noto-serif-sc/400.css';
 import '@fontsource/noto-serif-sc/700.css';
 import '@fontsource/noto-serif-tc/400.css';
 import '@fontsource/noto-serif-tc/700.css';
+import { registerPwaInstall } from './pwa/pwaInstall';
+import { registerPwaUpdates } from './pwa/pwaUpdate';
+
+registerPwaInstall();
+registerPwaUpdates();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
