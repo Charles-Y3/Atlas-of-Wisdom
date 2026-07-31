@@ -261,7 +261,10 @@ button {
 .map-cluster-count,
 .map-point-label,
 .map-country-label,
-.map-city-label {
+.map-admin1-label,
+.map-city-label,
+.map-river-label,
+.map-physical-label {
   position: absolute;
   transform: translate(-50%, -50%);
   white-space: nowrap;
@@ -307,6 +310,37 @@ button {
   max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.map-admin1-label {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 8.5px;
+  letter-spacing: 0.03em;
+  color: rgba(255, 253, 246, 0.62);
+  text-shadow: 0 1px 2px rgba(20, 30, 40, 0.55);
+  pointer-events: none;
+}
+
+.map-river-label {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 8.5px;
+  letter-spacing: 0.03em;
+  color: rgba(190, 224, 232, 0.75);
+  text-shadow: 0 1px 2px rgba(20, 30, 40, 0.6);
+  pointer-events: none;
+}
+
+.map-physical-label {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(60, 45, 25, 0.55);
+  text-shadow: 0 1px 1px rgba(255, 253, 246, 0.4);
+  pointer-events: none;
 }
 
 .map-compass {

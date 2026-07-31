@@ -11,6 +11,7 @@
     "validate-data": "tsx scripts/validate-data.ts",
     "prebuild": "tsx scripts/validate-data.ts",
     "gen:basemap": "tsx scripts/gen-basemap.ts",
+    "gen:relief": "tsx scripts/gen-relief.ts",
     "gen:illustrations": "tsx scripts/gen-illustrations.ts"
   },
   "dependencies": {
@@ -24,12 +25,14 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
     "@types/node": "^26.1.2",
     "@types/react": "^18.3.8",
     "@types/react-dom": "^18.3.0",
     "@types/topojson-client": "^3.1.5",
     "@types/topojson-specification": "^1.0.5",
     "@vitejs/plugin-react": "^4.3.1",
+    "adm-zip": "^0.5.18",
     "opencc-js": "^1.4.1",
     "sharp": "^0.35.3",
     "topojson-client": "^3.1.0",

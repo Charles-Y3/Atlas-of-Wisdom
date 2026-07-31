@@ -17,10 +17,99 @@ const CLUSTER_MAX_ZOOM = 4;
 const LABEL_MIN_ZOOM = CLUSTER_MAX_ZOOM;
 const COUNTRY_LABEL_MIN_ZOOM = 1.2;
 const COUNTRY_LABEL_MAX_ZOOM = 3.4;
+/** State/province tier — bridges country and city zoom so a close-up on a
+ *  single country isn't a blank tint with no labels at all. */
+const ADMIN1_LABEL_MIN_ZOOM = 3.0;
+const ADMIN1_LABEL_MAX_ZOOM = 7;
+/** City names stay on past LABEL_MIN_ZOOM instead of vanishing exactly when
+ *  place-pin labels take over — that gap used to leave zoomed-in views with
+ *  no text at all wherever there was no curated Atlas location nearby. */
 const CITY_LABEL_MIN_ZOOM = 3.0;
-const CITY_LABEL_MAX_ZOOM = LABEL_MIN_ZOOM;
-/** Max country names on screen at once — avoids Pacific clutter. */
+/** Major rivers (Amazon, Nile, Yangtze…) — same tier as cities. */
+const RIVER_LABEL_MIN_ZOOM = 2.2;
+const RIVER_LABEL_MAX_ZOOM = 7;
+/** Mountain ranges, deserts, plains — the lowest-priority label tier. */
+const PHYSICAL_LABEL_MIN_ZOOM = 2.0;
+const PHYSICAL_LABEL_MAX_ZOOM = 6;
+/** Max names considered per tier per frame — real limiting now happens via
+ *  the collision placement below; these just bound how much work a frame does. */
 const MAX_COUNTRY_LABELS = 36;
+const MAX_ADMIN1_LABELS = 24;
+const MAX_PHYSICAL_LABELS = 20;
+const MAX_RIVER_LABELS = 20;
+const CITY_CANDIDATE_CAP = 500;
+
+/** On-screen box for each label kind — used to keep newly-placed labels from
+ *  overlapping ones already placed this frame, in priority order (cluster >
+ *  place > country > city > river > admin1 > physical). Width comes from a
+ *  real canvas measureText() of the actual displayed string (see
+ *  measureLabelWidth below), so CJK labels — which run much wider per
+ *  character than Latin ones — get an accurate box instead of an
+ *  under-sized one that still collides. */
+interface LabelBoxSpec {
+  sizePx: number;
+  family: 'display' | 'body';
+  bold?: boolean;
+  italic?: boolean;
+  uppercase?: boolean;
+  letterSpacingEm?: number;
+  padW: number;
+  maxW: number;
+  h: number;
+  anchor: 'center' | 'top';
+}
+const BOX_SPEC: Record<OverlayKind, LabelBoxSpec> = {
+  cluster: { sizePx: 12, bold: true, family: 'display', padW: 6, maxW: 40, h: 20, anchor: 'center' },
+  place: { sizePx: 11.5, family: 'body', padW: 12, maxW: 160, h: 16, anchor: 'top' },
+  country: { sizePx: 10, family: 'display', letterSpacingEm: 0.04, padW: 4, maxW: 240, h: 13, anchor: 'center' },
+  city: { sizePx: 9.5, family: 'body', padW: 10, maxW: 100, h: 14, anchor: 'top' },
+  river: { sizePx: 8.5, italic: true, family: 'display', letterSpacingEm: 0.03, padW: 4, maxW: 180, h: 11, anchor: 'center' },
+  admin1: { sizePx: 8.5, italic: true, family: 'display', letterSpacingEm: 0.03, padW: 4, maxW: 180, h: 11, anchor: 'center' },
+  physical: {
+    sizePx: 9,
+    italic: true,
+    uppercase: true,
+    family: 'display',
+    letterSpacingEm: 0.08,
+    padW: 4,
+    maxW: 180,
+    h: 11,
+    anchor: 'center',
+  },
+};
+
+/** Resolves the app's CSS font-family custom properties once (they never
+ *  change at runtime) so canvas measureText() uses the same fonts as the
+ *  actual rendered `<span>` overlays. */
+let fontFamiliesCache: { display: string; body: string } | null = null;
+function getFontFamilies(): { display: string; body: string } {
+  if (!fontFamiliesCache) {
+    const style = getComputedStyle(document.documentElement);
+    fontFamiliesCache = {
+      display: style.getPropertyValue('--font-display').trim() || 'serif',
+      body: style.getPropertyValue('--font-body').trim() || 'serif',
+    };
+  }
+  return fontFamiliesCache;
+}
+
+let measureCanvasCtx: CanvasRenderingContext2D | null = null;
+function measureLabelWidth(text: string, spec: LabelBoxSpec): number {
+  if (!measureCanvasCtx) measureCanvasCtx = document.createElement('canvas').getContext('2d');
+  const displayed = spec.uppercase ? text.toUpperCase() : text;
+  const fonts = getFontFamilies();
+  const family = spec.family === 'display' ? fonts.display : fonts.body;
+  const font = `${spec.italic ? 'italic ' : ''}${spec.bold ? '700 ' : ''}${spec.sizePx}px ${family}`;
+  let width: number;
+  if (measureCanvasCtx) {
+    measureCanvasCtx.font = font;
+    width = measureCanvasCtx.measureText(displayed).width;
+  } else {
+    width = displayed.length * spec.sizePx * 0.6;
+  }
+  const letterSpacing = (spec.letterSpacingEm ?? 0) * spec.sizePx * Math.max(0, displayed.length - 1);
+  return width + letterSpacing;
+}
 
 /** True when lng/lat faces the camera on a globe (hides far-side project() ghosts). */
 function isFrontHemisphere(map: maplibregl.Map, lng: number, lat: number): boolean {
@@ -102,7 +191,7 @@ function buildQuestTrailGeoJson(stops: QuestTrailStop[] | null | undefined) {
   };
 }
 
-type OverlayKind = 'cluster' | 'place' | 'country' | 'city';
+type OverlayKind = 'cluster' | 'place' | 'country' | 'admin1' | 'city' | 'river' | 'physical';
 
 interface Overlay {
   key: string;
@@ -115,8 +204,11 @@ interface Overlay {
 const OVERLAY_CLASS: Record<OverlayKind, string> = {
   cluster: 'map-cluster-count',
   country: 'map-country-label',
+  admin1: 'map-admin1-label',
   city: 'map-city-label',
   place: 'map-point-label',
+  river: 'map-river-label',
+  physical: 'map-physical-label',
 };
 
 function buildGeoJson(
@@ -211,6 +303,18 @@ export default function GlobeMap({
   const overlayElsRef = useRef(new Map<string, HTMLSpanElement>());
   /** Prefer keeping the same country names across frames to avoid identity flicker. */
   const stickyCountryKeysRef = useRef<string[]>([]);
+  /** Same idea, for state/province names. */
+  const stickyAdmin1KeysRef = useRef<string[]>([]);
+  /** Same idea, for physical-feature names. */
+  const stickyPhysicalKeysRef = useRef<string[]>([]);
+  /** Same idea, for river names. */
+  const stickyRiverKeysRef = useRef<string[]>([]);
+  /** Consecutive sync() calls a label has been absent for. MapLibre's
+   *  queryRenderedFeatures/querySourceFeatures can transiently return empty
+   *  for a point near a tile edge mid-drag; tolerating a couple of misses
+   *  before removing the DOM node avoids the labels-flicker-out-while-
+   *  rotating artifact this caused. */
+  const overlayMissesRef = useRef(new Map<string, number>());
 
   const detailedMap = useSettings((s) => s.detailedMapWhenOnline);
 
@@ -228,6 +332,13 @@ export default function GlobeMap({
     const offline = styleModeRef.current === 'offline';
     const { width, height } = map.transform;
 
+    // Occupancy boxes claimed so far this frame. Labels are attempted in
+    // priority order below and skipped if they'd overlap something already
+    // placed — real decluttering instead of a flat per-tier count cap.
+    const placedBoxes: { x1: number; y1: number; x2: number; y2: number }[] = [];
+    const boxFits = (x1: number, y1: number, x2: number, y2: number) =>
+      placedBoxes.every((b) => x1 >= b.x2 || x2 <= b.x1 || y1 >= b.y2 || y2 <= b.y1);
+
     const pushPoint = (
       lng: number,
       lat: number,
@@ -239,7 +350,17 @@ export default function GlobeMap({
       if (!text || !isFrontHemisphere(map, lng, lat)) return;
       const p = map.project([lng, lat]);
       if (p.x < -20 || p.y < -20 || p.x > width + 20 || p.y > height + 20) return;
-      items.push({ key, x: p.x, y: p.y + yOff, text, kind });
+      const x = p.x;
+      const y = p.y + yOff;
+      const spec = BOX_SPEC[kind];
+      const w = Math.min(spec.maxW, measureLabelWidth(text, spec) + spec.padW);
+      const x1 = x - w / 2;
+      const x2 = x + w / 2;
+      const y1 = spec.anchor === 'center' ? y - spec.h / 2 : y;
+      const y2 = spec.anchor === 'center' ? y + spec.h / 2 : y + spec.h;
+      if (!boxFits(x1, y1, x2, y2)) return;
+      placedBoxes.push({ x1, y1, x2, y2 });
+      items.push({ key, x, y, text, kind });
     };
 
     if (map.getLayer('clusters')) {
@@ -247,6 +368,14 @@ export default function GlobeMap({
         if (f.geometry.type !== 'Point') continue;
         const [lng, lat] = f.geometry.coordinates as [number, number];
         pushPoint(lng, lat, String(f.properties?.point_count ?? ''), 'cluster', `c${f.properties?.cluster_id}`);
+      }
+    }
+
+    if (zoom >= LABEL_MIN_ZOOM && map.getLayer('points')) {
+      for (const f of map.queryRenderedFeatures({ layers: ['points'] })) {
+        if (f.geometry.type !== 'Point') continue;
+        const [lng, lat] = f.geometry.coordinates as [number, number];
+        pushPoint(lng, lat, String(f.properties?.name ?? ''), 'place', `p${f.properties?.id ?? `${lng},${lat}`}`, 12);
       }
     }
 
@@ -286,33 +415,147 @@ export default function GlobeMap({
       stickyCountryKeysRef.current = [];
     }
 
-    if (offline && zoom >= CITY_LABEL_MIN_ZOOM && zoom < CITY_LABEL_MAX_ZOOM && map.getLayer('cities')) {
-      for (const f of map.queryRenderedFeatures({ layers: ['cities'] })) {
+    // State/province labels: same sticky + nearest-refill approach as countries.
+    if (offline && zoom >= ADMIN1_LABEL_MIN_ZOOM && zoom < ADMIN1_LABEL_MAX_ZOOM && map.getSource('admin1-labels')) {
+      const feats = map.querySourceFeatures('admin1-labels');
+      const byName = new Map<string, { lng: number; lat: number; name: string; dist: number }>();
+      const c = map.getCenter();
+      for (const f of feats) {
         if (f.geometry.type !== 'Point') continue;
         const [lng, lat] = f.geometry.coordinates as [number, number];
-        pushPoint(lng, lat, String(f.properties?.name ?? ''), 'city', `ci${f.properties?.name}:${lng}`, 10);
+        const name = String(f.properties?.name ?? '');
+        if (!name || !isFrontHemisphere(map, lng, lat)) continue;
+        const p = map.project([lng, lat]);
+        if (p.x < -20 || p.y < -20 || p.x > width + 20 || p.y > height + 20) continue;
+        const dist = (lng - c.lng) ** 2 + (lat - c.lat) ** 2;
+        const prev = byName.get(name);
+        if (!prev || dist < prev.dist) byName.set(name, { lng, lat, name, dist });
+      }
+
+      const kept: string[] = [];
+      for (const name of stickyAdmin1KeysRef.current) {
+        const s = byName.get(name);
+        if (!s) continue;
+        kept.push(name);
+        pushPoint(s.lng, s.lat, s.name, 'admin1', `a1${s.name}`);
+        byName.delete(name);
+      }
+      const refill = [...byName.values()].sort((a, b) => a.dist - b.dist);
+      for (const s of refill) {
+        if (kept.length >= MAX_ADMIN1_LABELS) break;
+        kept.push(s.name);
+        pushPoint(s.lng, s.lat, s.name, 'admin1', `a1${s.name}`);
+      }
+      stickyAdmin1KeysRef.current = kept;
+    } else {
+      stickyAdmin1KeysRef.current = [];
+    }
+
+    // Cities: population-ranked candidates, placed until each collides —
+    // no artificial reveal cap, so a region with no top-tier metropolis
+    // still gets whatever smaller towns fit once you're zoomed in enough.
+    if (offline && zoom >= CITY_LABEL_MIN_ZOOM && map.getLayer('cities')) {
+      const candidates = map
+        .queryRenderedFeatures({ layers: ['cities'] })
+        .filter((f): f is typeof f & { geometry: GeoJSON.Point } => f.geometry.type === 'Point')
+        .map((f) => {
+          const [lng, lat] = f.geometry.coordinates as [number, number];
+          return { lng, lat, name: String(f.properties?.name ?? ''), pop: Number(f.properties?.pop ?? 0) };
+        })
+        .filter((c) => c.name)
+        .sort((a, b) => b.pop - a.pop)
+        .slice(0, CITY_CANDIDATE_CAP);
+      for (const c of candidates) {
+        pushPoint(c.lng, c.lat, c.name, 'city', `ci${c.name}:${c.lng}`, 10);
       }
     }
 
-    if (zoom >= LABEL_MIN_ZOOM && map.getLayer('points')) {
-      for (const f of map.queryRenderedFeatures({ layers: ['points'] })) {
+    // River labels: sticky + refill, but refill prefers low scalerank (major
+    // rivers like the Amazon/Nile) over distance so minor tributaries don't
+    // steal a slot from a more notable river further from screen center.
+    if (offline && zoom >= RIVER_LABEL_MIN_ZOOM && zoom < RIVER_LABEL_MAX_ZOOM && map.getSource('river-labels')) {
+      const feats = map.querySourceFeatures('river-labels');
+      const byName = new Map<string, { lng: number; lat: number; name: string; scalerank: number; dist: number }>();
+      const c = map.getCenter();
+      for (const f of feats) {
         if (f.geometry.type !== 'Point') continue;
         const [lng, lat] = f.geometry.coordinates as [number, number];
-        pushPoint(
-          lng,
-          lat,
-          String(f.properties?.name ?? ''),
-          'place',
-          `p${f.properties?.id ?? `${lng},${lat}`}`,
-          12,
-        );
+        const name = String(f.properties?.name ?? '');
+        if (!name || !isFrontHemisphere(map, lng, lat)) continue;
+        const p = map.project([lng, lat]);
+        if (p.x < -20 || p.y < -20 || p.x > width + 20 || p.y > height + 20) continue;
+        const dist = (lng - c.lng) ** 2 + (lat - c.lat) ** 2;
+        const scalerank = Number(f.properties?.scalerank ?? 10);
+        const prev = byName.get(name);
+        if (!prev || dist < prev.dist) byName.set(name, { lng, lat, name, scalerank, dist });
       }
+
+      const kept: string[] = [];
+      for (const name of stickyRiverKeysRef.current) {
+        const s = byName.get(name);
+        if (!s) continue;
+        kept.push(name);
+        pushPoint(s.lng, s.lat, s.name, 'river', `ri${s.name}`);
+        byName.delete(name);
+      }
+      const refill = [...byName.values()].sort((a, b) => a.scalerank - b.scalerank || a.dist - b.dist);
+      for (const s of refill) {
+        if (kept.length >= MAX_RIVER_LABELS) break;
+        kept.push(s.name);
+        pushPoint(s.lng, s.lat, s.name, 'river', `ri${s.name}`);
+      }
+      stickyRiverKeysRef.current = kept;
+    } else {
+      stickyRiverKeysRef.current = [];
+    }
+
+    // Physical-feature labels: same sticky + nearest-refill approach, lowest priority.
+    if (
+      offline &&
+      zoom >= PHYSICAL_LABEL_MIN_ZOOM &&
+      zoom < PHYSICAL_LABEL_MAX_ZOOM &&
+      map.getSource('physical-labels')
+    ) {
+      const feats = map.querySourceFeatures('physical-labels');
+      const byName = new Map<string, { lng: number; lat: number; name: string; dist: number }>();
+      const c = map.getCenter();
+      for (const f of feats) {
+        if (f.geometry.type !== 'Point') continue;
+        const [lng, lat] = f.geometry.coordinates as [number, number];
+        const name = String(f.properties?.name ?? '');
+        if (!name || !isFrontHemisphere(map, lng, lat)) continue;
+        const p = map.project([lng, lat]);
+        if (p.x < -20 || p.y < -20 || p.x > width + 20 || p.y > height + 20) continue;
+        const dist = (lng - c.lng) ** 2 + (lat - c.lat) ** 2;
+        const prev = byName.get(name);
+        if (!prev || dist < prev.dist) byName.set(name, { lng, lat, name, dist });
+      }
+
+      const kept: string[] = [];
+      for (const name of stickyPhysicalKeysRef.current) {
+        const s = byName.get(name);
+        if (!s) continue;
+        kept.push(name);
+        pushPoint(s.lng, s.lat, s.name, 'physical', `ph${s.name}`);
+        byName.delete(name);
+      }
+      const refill = [...byName.values()].sort((a, b) => a.dist - b.dist);
+      for (const s of refill) {
+        if (kept.length >= MAX_PHYSICAL_LABELS) break;
+        kept.push(s.name);
+        pushPoint(s.lng, s.lat, s.name, 'physical', `ph${s.name}`);
+      }
+      stickyPhysicalKeysRef.current = kept;
+    } else {
+      stickyPhysicalKeysRef.current = [];
     }
 
     const els = overlayElsRef.current;
+    const misses = overlayMissesRef.current;
     const alive = new Set<string>();
     for (const o of items) {
       alive.add(o.key);
+      misses.delete(o.key);
       let el = els.get(o.key);
       if (!el) {
         el = document.createElement('span');
@@ -326,6 +569,12 @@ export default function GlobeMap({
     }
     for (const [key, el] of els) {
       if (alive.has(key)) continue;
+      const missCount = (misses.get(key) ?? 0) + 1;
+      if (missCount < 2) {
+        misses.set(key, missCount);
+        continue;
+      }
+      misses.delete(key);
       el.remove();
       els.delete(key);
     }
@@ -533,6 +782,10 @@ export default function GlobeMap({
       for (const el of overlayElsRef.current.values()) el.remove();
       overlayElsRef.current.clear();
       stickyCountryKeysRef.current = [];
+      stickyAdmin1KeysRef.current = [];
+      stickyPhysicalKeysRef.current = [];
+      stickyRiverKeysRef.current = [];
+      overlayMissesRef.current.clear();
       map.remove();
       mapRef.current = null;
     };
