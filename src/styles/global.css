@@ -163,8 +163,9 @@ button {
   user-select: none;
   scroll-behavior: auto;
 }
-.chip-row.is-dragging .chip,
-.chip-row.is-dragging button {
+/* Only mute chip hit-testing once a real drag has started (see ScrollHintRow). */
+.chip-row.is-dragging > .chip,
+.chip-row.is-dragging > button {
   pointer-events: none;
 }
 
@@ -1105,14 +1106,9 @@ button {
 
 .quest-list { display: flex; flex-direction: column; gap: 12px; }
 
-.quest-tier-section { margin-bottom: 22px; }
-.quest-tier-heading {
-  margin: 0 0 10px;
-  font-size: 18px;
-  font-family: var(--font-display);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.quest-tier-tabs,
+.collection-tabs {
+  margin-bottom: 12px;
 }
 .quest-tier-locked {
   opacity: 0.85;

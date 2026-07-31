@@ -14,6 +14,8 @@ interface SettingsState {
   /** First-run preferences gate completed (after language). */
   prefsChosen: boolean;
   completePrefs: () => void;
+  /** Re-show the preferences gate (e.g. after progress reset). */
+  reopenPrefsGate: () => void;
 }
 
 // Persisted separately from exploration progress so "Reset progress" never
@@ -29,6 +31,7 @@ export const useSettings = create<SettingsState>()(
       setSoundEnabled: (soundEnabled) => set({ soundEnabled }),
       prefsChosen: false,
       completePrefs: () => set({ prefsChosen: true }),
+      reopenPrefsGate: () => set({ prefsChosen: false }),
     }),
     {
       name: 'atlas-settings',

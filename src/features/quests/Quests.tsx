@@ -234,54 +234,66 @@ function QuestCard({
 export default function Quests() {
   const { t } = useT();
   const completedQuests = useProgress((s) => s.completedQuests);
+  const [tier, setTier] = useState<QuestTier>('beginner');
   const [openId, setOpenId] = useState<string | null>(null);
+
+  const unlocked = questTierUnlocked(tier, completedQuests);
+  const list = QUESTS_BY_TIER[tier];
+  const prev = PREV_TIER[tier];
 
   return (
     <div className="page">
       <h1 className="page-title">🛤️ {t('questsTitle')}</h1>
       <p className="page-subtitle">{t('questsSubtitle')}</p>
 
-      {QUEST_TIERS.map((tier) => {
-        const unlocked = questTierUnlocked(tier, completedQuests);
-        const list = QUESTS_BY_TIER[tier];
-        const prev = PREV_TIER[tier];
-        return (
-          <section key={tier} className="quest-tier-section">
-            <h2 className="quest-tier-heading">
-              {t(TIER_LABEL[tier])}
-              {!unlocked && <span className="tag">🔒</span>}
-            </h2>
-            {!unlocked ? (
-              <div className="card quest-tier-locked">
-                <p>
-                  {t('questTierLocked').replace(
-                    '{tier}',
-                    prev ? t(TIER_LABEL[prev]) : t(TIER_LABEL.beginner),
-                  )}
-                </p>
-                <ul className="quest-tier-locked-names">
-                  {list.map((q) => (
-                    <li key={q.id}>
-                      <span aria-hidden>{q.emoji}</span> <LockedQuestName quest={q} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <div className="quest-list">
-                {list.map((q) => (
-                  <QuestCard
-                    key={q.id}
-                    q={q}
-                    expanded={openId === q.id}
-                    onToggle={() => setOpenId(openId === q.id ? null : q.id)}
-                  />
-                ))}
-              </div>
+      <div className="chip-row profile-tabs quest-tier-tabs" style={{ marginBottom: 12 }}>
+        {QUEST_TIERS.map((tId) => {
+          const tierOpen = questTierUnlocked(tId, completedQuests);
+          return (
+            <button
+              key={tId}
+              type="button"
+              className={`chip ${tier === tId ? 'active' : ''}`}
+              onClick={() => {
+                setTier(tId);
+                setOpenId(null);
+              }}
+            >
+              {t(TIER_LABEL[tId])}
+              {!tierOpen && ' 🔒'}
+            </button>
+          );
+        })}
+      </div>
+
+      {!unlocked ? (
+        <div className="card quest-tier-locked">
+          <p>
+            {t('questTierLocked').replace(
+              '{tier}',
+              prev ? t(TIER_LABEL[prev]) : t(TIER_LABEL.beginner),
             )}
-          </section>
-        );
-      })}
+          </p>
+          <ul className="quest-tier-locked-names">
+            {list.map((q) => (
+              <li key={q.id}>
+                <span aria-hidden>{q.emoji}</span> <LockedQuestName quest={q} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <div className="quest-list">
+          {list.map((q) => (
+            <QuestCard
+              key={q.id}
+              q={q}
+              expanded={openId === q.id}
+              onToggle={() => setOpenId(openId === q.id ? null : q.id)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

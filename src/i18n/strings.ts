@@ -319,7 +319,10 @@ export const UI = {
   profileStatCollections: localized('Collections completed', '已集齐收藏'),
   profileStatContinents: localized('Continents reached', '已到达大洲'),
   profileReset: localized('Reset exploration progress', '重置探索进度'),
-  profileResetConfirm: localized('This erases all your discoveries, XP and achievements. Are you sure?', '这将清除你的全部发现、经验与成就。确定吗？'),
+  profileResetConfirm: localized(
+    'This erases all your discoveries, XP and achievements, and asks for your settings again. Are you sure?',
+    '这将清除你的全部发现、经验与成就，并再次询问设置偏好。确定吗？',
+  ),
   profileAbout: localized('Part of the Great Harmony suite', '大同系列应用之一'),
   profileExportPassport: localized('Export passport', '导出探索护照'),
   journalTitle: localized('My Reflections', '我的反思'),

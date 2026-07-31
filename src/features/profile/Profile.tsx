@@ -60,8 +60,12 @@ export default function Profile() {
         ? 'installGuideAndroid'
         : 'installGuideDesktop';
 
+  const reopenPrefsGate = useSettings((s) => s.reopenPrefsGate);
+
   function reset() {
-    if (window.confirm(t('profileResetConfirm'))) progress.reset();
+    if (!window.confirm(t('profileResetConfirm'))) return;
+    progress.reset();
+    reopenPrefsGate();
   }
 
   async function handleInstall() {

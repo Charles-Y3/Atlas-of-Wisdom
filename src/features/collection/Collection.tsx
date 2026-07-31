@@ -10,7 +10,6 @@ import { illustrationCandidates } from '../../data/illustrations';
 import { livedPlaceIds, useProgress } from '../../state/store';
 import type { CollectionDef } from '../../data/types';
 import type { UiKey } from '../../i18n/strings';
-import ScrollHintRow from '../../components/ScrollHintRow';
 
 type Tab = CollectionDef['kind'] | 'legends' | 'gallery';
 
@@ -175,19 +174,20 @@ export default function Collection() {
       <h1 className="page-title">🗃️ {t('collectionTitle')}</h1>
       <p className="page-subtitle">{subtitle}</p>
 
-      <div style={{ marginBottom: 4 }}>
-        <ScrollHintRow>
-          {TABS.map((tabDef) => (
-            <button
-              key={tabDef.kind}
-              type="button"
-              className={`chip ${tab === tabDef.kind ? 'active' : ''}`}
-              onClick={() => setTab(tabDef.kind)}
-            >
-              {tabDef.emoji} {t(tabDef.labelKey)}
-            </button>
-          ))}
-        </ScrollHintRow>
+      <div className="chip-row profile-tabs collection-tabs" style={{ marginBottom: 12 }}>
+        {TABS.map((tabDef) => (
+          <button
+            key={tabDef.kind}
+            type="button"
+            className={`chip ${tab === tabDef.kind ? 'active' : ''}`}
+            onClick={() => {
+              setTab(tabDef.kind);
+              setLightboxId(null);
+            }}
+          >
+            {tabDef.emoji} {t(tabDef.labelKey)}
+          </button>
+        ))}
       </div>
 
       <div className="coll-list">
