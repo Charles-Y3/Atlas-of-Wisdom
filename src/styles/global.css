@@ -1646,6 +1646,7 @@ button {
 .gate-emoji { font-size: 56px; }
 .gate-title { font-size: 24px; margin: 10px 0 6px; }
 .gate-subtitle { color: var(--ink-soft); font-size: 14px; margin: 0 0 20px; }
+.gate-bilingual { display: flex; flex-direction: column; gap: 0.2em; }
 .gate-options { display: flex; flex-direction: column; gap: 10px; }
 .gate-option {
   display: flex; align-items: center; gap: 12px; justify-content: center;

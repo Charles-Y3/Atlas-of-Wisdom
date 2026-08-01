@@ -19,8 +19,16 @@ export default function LanguageGate() {
     <div className="gate">
       <div className="gate-card">
         <div className="gate-emoji">🗺️</div>
-        <h1 className="gate-title">{GATE_PREVIEW_LOCALES.map((l) => t('gateWelcome', l)).join(' · ')}</h1>
-        <p className="gate-subtitle">{GATE_PREVIEW_LOCALES.map((l) => t('gateSubtitle', l)).join(' ')}</p>
+        <h1 className="gate-title gate-bilingual">
+          {GATE_PREVIEW_LOCALES.map((l) => (
+            <span key={l}>{t('gateWelcome', l)}</span>
+          ))}
+        </h1>
+        <p className="gate-subtitle gate-bilingual">
+          {GATE_PREVIEW_LOCALES.map((l) => (
+            <span key={l}>{t('gateSubtitle', l)}</span>
+          ))}
+        </p>
         <div className="gate-options">
           {VISIBLE_LOCALES.map((locale) => (
             <button key={locale} className="gate-option" onClick={() => setLocale(locale)}>
@@ -29,7 +37,11 @@ export default function LanguageGate() {
             </button>
           ))}
         </div>
-        <p className="gate-footnote">{GATE_PREVIEW_LOCALES.map((l) => t('gateChangeLater', l)).join(' · ')}</p>
+        <p className="gate-footnote gate-bilingual">
+          {GATE_PREVIEW_LOCALES.map((l) => (
+            <span key={l}>{t('gateChangeLater', l)}</span>
+          ))}
+        </p>
       </div>
     </div>
   );

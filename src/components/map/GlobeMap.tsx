@@ -358,16 +358,26 @@ export default function GlobeMap({
       const x2 = x + w / 2;
       const y1 = spec.anchor === 'center' ? y - spec.h / 2 : y;
       const y2 = spec.anchor === 'center' ? y + spec.h / 2 : y + spec.h;
-      if (!boxFits(x1, y1, x2, y2)) return;
+      // Cluster counts always show — a gold circle with no number looks broken.
+      // They still claim a box so place/country labels dodge them.
+      if (kind !== 'cluster' && !boxFits(x1, y1, x2, y2)) return;
       placedBoxes.push({ x1, y1, x2, y2 });
       items.push({ key, x, y, text, kind });
     };
 
     if (map.getLayer('clusters')) {
+      // Dedupe: queryRenderedFeatures can return the same cluster from
+      // multiple tiles; only the first would keep a label after collision.
+      const seenClusters = new Set<number>();
       for (const f of map.queryRenderedFeatures({ layers: ['clusters'] })) {
         if (f.geometry.type !== 'Point') continue;
+        const clusterId = f.properties?.cluster_id as number | undefined;
+        if (clusterId != null) {
+          if (seenClusters.has(clusterId)) continue;
+          seenClusters.add(clusterId);
+        }
         const [lng, lat] = f.geometry.coordinates as [number, number];
-        pushPoint(lng, lat, String(f.properties?.point_count ?? ''), 'cluster', `c${f.properties?.cluster_id}`);
+        pushPoint(lng, lat, String(f.properties?.point_count ?? ''), 'cluster', `c${clusterId}`);
       }
     }
 
