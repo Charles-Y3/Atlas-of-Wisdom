@@ -329,7 +329,7 @@ export const SOUTH_SOUTHEAST_ASIA: AtlasLocation[] = [
     region: localized('Yangon', '仰光'),
     continent: 'asia',
     coords: [96.1495, 16.7983],
-    period: { fromYear: -588 },
+    period: { fromYear: -528 },
     status: localized('Active pagoda, national symbol', '现存活跃的佛塔，国家象征'),
     whyItMatters: localized(
       [
@@ -342,7 +342,7 @@ export const SOUTH_SOUTHEAST_ASIA: AtlasLocation[] = [
       ],
     ),
     timeline: [
-      { year: -588, event: localized('Legendary founding with the Buddha\'s hair relics.', '传说中供奉佛发舍利而建。') },
+      { year: -528, event: localized('Legendary founding with the Buddha\'s hair relics.', '传说中供奉佛发舍利而建。') },
       { year: 1453, event: localized('Queen Shin Sawbu gilds the stupa with her own weight in gold.', '信修浮女王以等身黄金贴塔。') },
       { year: 1774, event: localized('Raised to its present height.', '增建至现今高度。') },
     ],

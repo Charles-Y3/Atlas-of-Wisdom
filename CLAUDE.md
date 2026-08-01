@@ -51,6 +51,11 @@ Simplified Chinese / Traditional Chinese):
 - `npm run validate-data` (also runs pre-build) checks id uniqueness, coord
   ranges, timeline order, en/zh paragraph parity, and person↔location
   cross-refs. Keep it green.
+- `validate-data` is structural only — it does not check factual accuracy,
+  cross-tradition neutrality, or narrative voice. Content review is a
+  separate manual pass logged in `docs/content-review.md`; add a dated
+  entry there (and fix or flag any issues found) whenever a location is
+  added or its `whyItMatters`/timeline is edited significantly.
 
 ## Content voice (the differentiator)
 

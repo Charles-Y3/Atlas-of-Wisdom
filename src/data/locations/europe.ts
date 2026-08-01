@@ -309,7 +309,7 @@ export const EUROPE: AtlasLocation[] = [
     ),
     timeline: [
       { year: 963, event: localized('Athanasius founds the Great Lavra monastery.', '阿塔纳修创建大拉夫拉修道院。') },
-      { year: 1054, event: localized('Athos becomes the heart of Orthodox monasticism.', '阿索斯成为东正教隐修传统的中心。') },
+      { year: 972, event: localized('The Tragos charter formally establishes Athos\'s monastic self-governance.', '《特拉戈斯宪章》正式确立阿索斯的隐修自治体制。') },
       { year: 1988, event: localized('Inscribed by UNESCO.', '列入世界遗产。') },
     ],
     connectedPeople: [],

@@ -86,11 +86,11 @@ export const AFRICA_AMERICAS_OCEANIA: AtlasLocation[] = [
     whyItMatters: localized(
       [
         'The institution often recognised as the oldest existing university in the world was founded in 859 AD by Fatima al-Fihri, a merchant\'s daughter who spent her entire inheritance building a mosque and school for her community.',
-        'Its library, recently restored, guards manuscripts over a thousand years old. Scholars here connected the Islamic world with medieval Europe — Gerbert of Aurillac, later Pope Sylvester II, is said to have brought Arabic numerals north after studying in Morocco.',
+        'Its library, recently restored, guards manuscripts over a thousand years old, including one of the earliest surviving copies of Ibn Khaldun\'s Muqaddimah. Generations of scholars passed through its courtyards, among them the philosopher and physician Ibn Rushd (Averroes) and the geographer Muhammad al-Idrisi.',
       ],
       [
         '这所常被认定为世界上现存最古老的大学，由法蒂玛·菲赫里创办于公元859年 — 这位商人的女儿倾尽全部遗产，为她的社区修建了清真寺与学堂。',
-        '大学新近修复的藏书楼守护着上千年历史的手稿。这里的学者连接了伊斯兰世界与中世纪欧洲 — 相传后来成为教皇西尔维斯特二世的欧里亚克的热尔贝，正是在摩洛哥求学后将阿拉伯数字带往北方。',
+        '大学新近修复的藏书楼守护着上千年历史的手稿，其中包括伊本·赫勒敦《历史绪论》现存最早的抄本之一。一代代学者曾在此求学问道，包括哲学家兼医师伊本·鲁世德（阿威罗伊）与地理学家伊德里西。',
       ],
     ),
     timeline: [
@@ -334,11 +334,11 @@ export const AFRICA_AMERICAS_OCEANIA: AtlasLocation[] = [
     status: localized('State historic site', '州立历史遗址'),
     whyItMatters: localized(
       [
-        'A thousand years ago, the largest city north of Mexico stood beside the Mississippi — bigger than London of its day. Its people raised Monks Mound, an earthen pyramid with a footprint larger than the Great Pyramid of Giza, basket of soil by basket of soil.',
+        'A thousand years ago, the largest city north of Mexico stood beside the Mississippi — around 1150 its population rivalled that of London at the time. Its people raised Monks Mound, an earthen pyramid with a footprint larger than the Great Pyramid of Giza, basket of soil by basket of soil.',
         'A circle of tall posts — "Woodhenge" — tracked the sunrise through the seasons. Cahokia quietly corrects the map of where great cities and sky-watching sciences arose.',
       ],
       [
-        '一千年前，墨西哥以北最大的城市就矗立在密西西比河畔 — 比同时代的伦敦还大。这里的人们一筐土又一筐土，堆起了僧侣丘 — 一座占地面积超过吉萨大金字塔的土筑金字塔。',
+        '一千年前，墨西哥以北最大的城市就矗立在密西西比河畔 — 公元1150年前后，其人口与同期的伦敦不相上下。这里的人们一筐土又一筐土，堆起了僧侣丘 — 一座占地面积超过吉萨大金字塔的土筑金字塔。',
         '一圈高大的木柱 — “木亨吉” — 追踪着四季的日出。卡霍基亚悄悄修正了世界地图：伟大的城市与观天的学问，也曾在这里兴起。',
       ],
     ),
