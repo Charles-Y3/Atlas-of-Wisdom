@@ -40,12 +40,12 @@ const MAX_RIVER_LABELS = 20;
 const CITY_CANDIDATE_CAP = 500;
 
 /** On-screen box for each label kind — used to keep newly-placed labels from
- *  overlapping ones already placed this frame, in priority order (cluster >
- *  place > country > city > river > admin1 > physical). Width comes from a
- *  real canvas measureText() of the actual displayed string (see
+ *  overlapping ones already placed this frame, in priority order (place >
+ *  country > city > river > admin1 > physical). Width comes from a real
+ *  canvas measureText() of the actual displayed string (see
  *  measureLabelWidth below), so CJK labels — which run much wider per
  *  character than Latin ones — get an accurate box instead of an
- *  under-sized one that still collides. */
+ *  under-sized one that still collides. Cluster counts are WebGL icons. */
 interface LabelBoxSpec {
   sizePx: number;
   family: 'display' | 'body';
@@ -59,7 +59,6 @@ interface LabelBoxSpec {
   anchor: 'center' | 'top';
 }
 const BOX_SPEC: Record<OverlayKind, LabelBoxSpec> = {
-  cluster: { sizePx: 12, bold: true, family: 'display', padW: 6, maxW: 40, h: 20, anchor: 'center' },
   place: { sizePx: 11.5, family: 'body', padW: 12, maxW: 160, h: 16, anchor: 'top' },
   country: { sizePx: 10, family: 'display', letterSpacingEm: 0.04, padW: 4, maxW: 240, h: 13, anchor: 'center' },
   city: { sizePx: 9.5, family: 'body', padW: 10, maxW: 100, h: 14, anchor: 'top' },
@@ -77,6 +76,51 @@ const BOX_SPEC: Record<OverlayKind, LabelBoxSpec> = {
     anchor: 'center',
   },
 };
+
+/** Pre-baked digit icons for cluster counts (no glyph server; HTML overlays
+ *  mis-project on globe so numbers drifted off their circles). */
+const CLUSTER_COUNT_ICON_MAX = 80;
+const CLUSTER_COUNT_ICON_PREFIX = 'cluster-n-';
+
+function clusterCountStyleImage(count: number): {
+  width: number;
+  height: number;
+  data: Uint8Array;
+} {
+  // 64px @ pixelRatio 2 → 32 CSS px at icon-size 1. Font 26px here ≈ 13px
+  // bold display face once icon-size is applied (was .map-cluster-count 12px).
+  const size = 64;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return { width: size, height: size, data: new Uint8Array(size * size * 4) };
+  ctx.clearRect(0, 0, size, size);
+  const label = String(count);
+  const display = getFontFamilies().display;
+  const fontPx = count >= 100 ? 22 : count >= 10 ? 24 : 26;
+  ctx.font = `700 ${fontPx}px ${display}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  // Match text-shadow: 0 1px 2px rgba(0,0,0,0.35)
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+  ctx.shadowBlur = 2;
+  ctx.shadowOffsetY = 1;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(label, size / 2, size / 2);
+  const { data } = ctx.getImageData(0, 0, size, size);
+  return { width: size, height: size, data: new Uint8Array(data) };
+}
+
+function ensureClusterCountImages(map: maplibregl.Map) {
+  for (let n = 2; n <= CLUSTER_COUNT_ICON_MAX; n++) {
+    const id = `${CLUSTER_COUNT_ICON_PREFIX}${n}`;
+    const img = clusterCountStyleImage(n);
+    if (map.hasImage(id)) map.updateImage(id, img);
+    else map.addImage(id, img, { pixelRatio: 2 });
+  }
+}
 
 /** Resolves the app's CSS font-family custom properties once (they never
  *  change at runtime) so canvas measureText() uses the same fonts as the
@@ -191,7 +235,7 @@ function buildQuestTrailGeoJson(stops: QuestTrailStop[] | null | undefined) {
   };
 }
 
-type OverlayKind = 'cluster' | 'place' | 'country' | 'admin1' | 'city' | 'river' | 'physical';
+type OverlayKind = 'place' | 'country' | 'admin1' | 'city' | 'river' | 'physical';
 
 interface Overlay {
   key: string;
@@ -202,7 +246,6 @@ interface Overlay {
 }
 
 const OVERLAY_CLASS: Record<OverlayKind, string> = {
-  cluster: 'map-cluster-count',
   country: 'map-country-label',
   admin1: 'map-admin1-label',
   city: 'map-city-label',
@@ -358,16 +401,14 @@ export default function GlobeMap({
       const x2 = x + w / 2;
       const y1 = spec.anchor === 'center' ? y - spec.h / 2 : y;
       const y2 = spec.anchor === 'center' ? y + spec.h / 2 : y + spec.h;
-      // Cluster counts always show — a gold circle with no number looks broken.
-      // They still claim a box so place/country labels dodge them.
-      if (kind !== 'cluster' && !boxFits(x1, y1, x2, y2)) return;
+      if (!boxFits(x1, y1, x2, y2)) return;
       placedBoxes.push({ x1, y1, x2, y2 });
       items.push({ key, x, y, text, kind });
     };
 
+    // Reserve screen space over gold clusters (counts are WebGL icons) so
+    // country/place HTML labels don't sit on top of them.
     if (map.getLayer('clusters')) {
-      // Dedupe: queryRenderedFeatures can return the same cluster from
-      // multiple tiles; only the first would keep a label after collision.
       const seenClusters = new Set<number>();
       for (const f of map.queryRenderedFeatures({ layers: ['clusters'] })) {
         if (f.geometry.type !== 'Point') continue;
@@ -377,7 +418,11 @@ export default function GlobeMap({
           seenClusters.add(clusterId);
         }
         const [lng, lat] = f.geometry.coordinates as [number, number];
-        pushPoint(lng, lat, String(f.properties?.point_count ?? ''), 'cluster', `c${clusterId}`);
+        if (!isFrontHemisphere(map, lng, lat)) continue;
+        const p = map.project([lng, lat]);
+        if (p.x < -20 || p.y < -20 || p.x > width + 20 || p.y > height + 20) continue;
+        const r = 18;
+        placedBoxes.push({ x1: p.x - r, y1: p.y - r, x2: p.x + r, y2: p.y + r });
       }
     }
 
@@ -609,6 +654,17 @@ export default function GlobeMap({
         });
       }
 
+      ensureClusterCountImages(map);
+
+      const clusterRadius: maplibregl.ExpressionSpecification = [
+        'step',
+        ['get', 'point_count'],
+        13,
+        5,
+        17,
+        12,
+        22,
+      ];
       if (!map.getLayer('clusters')) {
         map.addLayer({
           id: 'clusters',
@@ -618,11 +674,44 @@ export default function GlobeMap({
           paint: {
             'circle-color': '#b08a3c',
             'circle-opacity': 0.9,
-            'circle-radius': ['step', ['get', 'point_count'], 13, 5, 17, 12, 22],
+            'circle-radius': clusterRadius,
             'circle-stroke-width': 2,
             'circle-stroke-color': '#fffdf6',
           },
         });
+      } else {
+        map.setPaintProperty('clusters', 'circle-radius', clusterRadius);
+      }
+
+      // Digit icons ride in the same WebGL globe pass as the circles, so
+      // counts stay centered even when HTML project() would miss.
+      // 13px bold Cinzel digits inside the gold circles.
+      const clusterCountLayout = {
+        'icon-image': [
+          'concat',
+          CLUSTER_COUNT_ICON_PREFIX,
+          [
+            'to-string',
+            ['min', CLUSTER_COUNT_ICON_MAX, ['max', 2, ['to-number', ['get', 'point_count']]]],
+          ],
+        ],
+        'icon-size': ['step', ['get', 'point_count'], 0.78, 5, 0.98, 12, 1.2],
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true,
+        'icon-padding': 0,
+      } as const;
+      if (!map.getLayer('cluster-counts')) {
+        map.addLayer({
+          id: 'cluster-counts',
+          type: 'symbol',
+          source: 'atlas',
+          filter: ['has', 'point_count'],
+          layout: { ...clusterCountLayout },
+        });
+      } else {
+        for (const [key, value] of Object.entries(clusterCountLayout)) {
+          map.setLayoutProperty('cluster-counts', key, value);
+        }
       }
 
       if (!map.getLayer('points')) {
@@ -731,16 +820,18 @@ export default function GlobeMap({
       if (id) onSelectRef.current?.(id);
     });
 
-    map.on('click', 'clusters', async (e) => {
+    const expandCluster = async (e: maplibregl.MapLayerMouseEvent) => {
       const f = e.features?.[0];
       if (!f) return;
       const clusterId = f.properties?.cluster_id as number;
       const source = map.getSource('atlas') as maplibregl.GeoJSONSource;
       const zoom = await source.getClusterExpansionZoom(clusterId);
       map.easeTo({ center: (f.geometry as GeoJSON.Point).coordinates as [number, number], zoom });
-    });
+    };
+    map.on('click', 'clusters', expandCluster);
+    map.on('click', 'cluster-counts', expandCluster);
 
-    for (const layer of ['points', 'clusters']) {
+    for (const layer of ['points', 'clusters', 'cluster-counts']) {
       map.on('mouseenter', layer, () => {
         map.getCanvas().style.cursor = 'pointer';
       });
