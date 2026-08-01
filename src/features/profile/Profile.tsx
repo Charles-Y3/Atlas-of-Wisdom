@@ -19,6 +19,7 @@ import ReflectionsJournal from './ReflectionsJournal';
 import PracticesJournal from './PracticesJournal';
 import RankLadder from './RankLadder';
 import { exportPassportPng } from './exportPassport';
+import { APP_VERSION } from '../../version';
 
 type Tab = 'overview' | 'journey' | 'achievements' | 'settings';
 type JourneySub = 'reflections' | 'practice';
@@ -301,6 +302,10 @@ export default function Profile() {
               🗑️ {t('profileReset')}
             </button>
           </div>
+
+          <p className="page-subtitle" style={{ marginTop: 8 }}>
+            {t('settingsVersion').replace('{v}', APP_VERSION)}
+          </p>
         </>
       )}
 

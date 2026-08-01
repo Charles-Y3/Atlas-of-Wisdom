@@ -176,6 +176,7 @@ export const UI = {
     'A soft chime when you rank up or unlock an achievement. Off by default.',
     '晋级或解锁成就时轻响一声。默认关闭。',
   ),
+  settingsVersion: localized('Version {v}', '版本 {v}'),
 
   // ── Location page ──────────────────────────────────────────────────
   locOverview: localized('Overview', '概览'),
