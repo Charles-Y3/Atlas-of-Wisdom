@@ -686,32 +686,40 @@ export default function GlobeMap({
       // Digit icons ride in the same WebGL globe pass as the circles, so
       // counts stay centered even when HTML project() would miss.
       // 13px bold Cinzel digits inside the gold circles.
-      const clusterCountLayout = {
-        'icon-image': [
-          'concat',
-          CLUSTER_COUNT_ICON_PREFIX,
-          [
-            'to-string',
-            ['min', CLUSTER_COUNT_ICON_MAX, ['max', 2, ['to-number', ['get', 'point_count']]]],
-          ],
+      const clusterIconImage: maplibregl.ExpressionSpecification = [
+        'concat',
+        CLUSTER_COUNT_ICON_PREFIX,
+        [
+          'to-string',
+          ['min', CLUSTER_COUNT_ICON_MAX, ['max', 2, ['to-number', ['get', 'point_count']]]],
         ],
-        'icon-size': ['step', ['get', 'point_count'], 0.78, 5, 0.98, 12, 1.2],
-        'icon-allow-overlap': true,
-        'icon-ignore-placement': true,
-        'icon-padding': 0,
-      } as const;
+      ];
+      const clusterIconSize: maplibregl.ExpressionSpecification = [
+        'step',
+        ['get', 'point_count'],
+        0.78,
+        5,
+        0.98,
+        12,
+        1.2,
+      ];
       if (!map.getLayer('cluster-counts')) {
         map.addLayer({
           id: 'cluster-counts',
           type: 'symbol',
           source: 'atlas',
           filter: ['has', 'point_count'],
-          layout: { ...clusterCountLayout },
+          layout: {
+            'icon-image': clusterIconImage,
+            'icon-size': clusterIconSize,
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': true,
+            'icon-padding': 0,
+          },
         });
       } else {
-        for (const [key, value] of Object.entries(clusterCountLayout)) {
-          map.setLayoutProperty('cluster-counts', key, value);
-        }
+        map.setLayoutProperty('cluster-counts', 'icon-image', clusterIconImage);
+        map.setLayoutProperty('cluster-counts', 'icon-size', clusterIconSize);
       }
 
       if (!map.getLayer('points')) {
