@@ -24,8 +24,11 @@ const NE_GEOJSON = {
   lakes: 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_lakes.geojson',
   places:
     'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_populated_places.geojson',
+  // Admin-1 stays at 50m — the 10m version alone was ~6 MB (4589 finely
+  // detailed subdivisions) for boundary precision that doesn't read at this
+  // app's zoom range. Everything else keeps the 10m detail bump.
   states:
-    'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_1_states_provinces.geojson',
+    'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_1_states_provinces.geojson',
   roads: 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_roads.geojson',
   physical:
     'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_geography_regions_points.geojson',
