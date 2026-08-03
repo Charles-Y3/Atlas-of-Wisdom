@@ -6,6 +6,13 @@ antique-atlas aesthetic (Cinzel + Noto Serif, parchment/ink/gold) and a
 distinct "explore when curious" niche — but has **no cross-app integration**
 (no shared links, XP or accounts) by design.
 
+## Portal version sync (do not skip)
+
+Listed on `small-steps-to-great-harmony` as id `atlas`. On every shippable
+commit+push: bump this repo's `package.json` version if needed, set the
+matching `version` in the portal's `src/data/apps.ts`, then commit and push
+the portal too. Details: `.cursor/rules/portal-version-sync.mdc`.
+
 ## Token efficiency (do not violate)
 
 Be frugal with tokens/context in every session: don't re-read files already
